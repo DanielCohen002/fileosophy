@@ -163,7 +163,6 @@ class MainActivityActionMode(private val mainActivityReference: WeakReference<Ma
                 !mainFragmentViewModel.getIsCloudOpenMode()
             ) {
                 hideOption(R.id.addshortcut, menu)
-                hideOption(R.id.compress, menu)
                 return true
             }
             // tv.setText(checkedItems.size());
@@ -190,7 +189,6 @@ class MainActivityActionMode(private val mainActivityReference: WeakReference<Ma
             }
             if (mainFragmentViewModel.openMode != OpenMode.FILE) {
                 hideOption(R.id.openwith, menu)
-                hideOption(R.id.compress, menu)
                 hideOption(R.id.hide, menu)
                 hideOption(R.id.addshortcut, menu)
                 if (mainFragmentViewModel.openMode == OpenMode.TRASH_BIN) {
@@ -364,21 +362,6 @@ class MainActivityActionMode(private val mainActivityReference: WeakReference<Ma
                         pasteHelper = PasteHelper(mainActivity, op, copies)
                         mainActivity.paste = pasteHelper
                     }
-                    mode.finish()
-                    true
-                }
-                R.id.compress -> {
-                    val copies1 = ArrayList<HybridFileParcelable>()
-                    var i4 = 0
-                    while (i4 < checkedItems.size) {
-                        copies1.add(checkedItems[i4].generateBaseFile())
-                        i4++
-                    }
-                    GeneralDialogCreation.showCompressDialog(
-                        mainActivity,
-                        copies1,
-                        mainActivity.currentMainFragment?.mainFragmentViewModel?.currentPath,
-                    )
                     mode.finish()
                     true
                 }

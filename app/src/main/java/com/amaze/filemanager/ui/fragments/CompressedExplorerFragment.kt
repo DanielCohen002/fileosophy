@@ -421,7 +421,6 @@ class CompressedExplorerFragment : Fragment(), BottomBarButtonPath {
                 hideOption(R.id.share, menu)
                 hideOption(R.id.openwith, menu)
                 showOption(R.id.all, menu)
-                hideOption(R.id.compress, menu)
                 hideOption(R.id.hide, menu)
                 showOption(R.id.ex, menu)
                 mode.title = getString(R.string.select)

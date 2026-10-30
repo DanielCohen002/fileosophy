@@ -221,7 +221,7 @@
         <activity-alias android:name="amazeutilsalias"
             android:targetActivity=".ui.activities.UtilitiesAliasActivity"
             android:exported="true"
-            android:enabled="true">
+            android:enabled="false">
             <intent-filter
                 android:label="@string/amaze_audio_player"
                 tools:ignore="AppLinkUrlError">

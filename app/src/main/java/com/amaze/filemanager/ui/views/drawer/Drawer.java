@@ -517,78 +517,6 @@ public class Drawer implements NavigationView.OnNavigationItemSelectedListener {
       }
     }
 
-    addNewItem(
-        menu,
-        LASTGROUP,
-        order++,
-        R.string.ftp,
-        new MenuMetadata(
-            () -> {
-              FragmentTransaction transaction2 =
-                  mainActivity.getSupportFragmentManager().beginTransaction();
-              transaction2.replace(R.id.content_frame, new FtpServerFragment());
-              mainActivity
-                  .getAppbar()
-                  .getAppbarLayout()
-                  .animate()
-                  .translationY(0)
-                  .setInterpolator(new DecelerateInterpolator(2))
-                  .start();
-              pending_fragmentTransaction = transaction2;
-              if (!isDrawerLocked) close();
-              else onDrawerClosed();
-            }),
-        R.drawable.ic_ftp_white_24dp,
-        null);
-
-    addNewItem(
-        menu,
-        LASTGROUP,
-        order++,
-        R.string.wifip2p,
-        new MenuMetadata(
-            () -> {
-              boolean isAUInstalled =
-                  PackageUtils.Companion.appInstalledOrNot(
-                      AboutActivity.PACKAGE_AMAZE_UTILS, mainActivity.getPackageManager());
-              if (isAUInstalled) {
-                try {
-                  Utils.openURL("amaze://teamamaze.xyz/transfer", mainActivity);
-                } catch (ActivityNotFoundException e) {
-                  mainActivity.startActivity(
-                      new Intent(mainActivity, UtilitiesAliasActivity.class));
-                }
-              } else {
-                mainActivity.startActivity(new Intent(mainActivity, UtilitiesAliasActivity.class));
-              }
-            }),
-        R.drawable.ic_round_connect_without_contact_24,
-        null);
-
-    addNewItem(
-        menu,
-        LASTGROUP,
-        order++,
-        R.string.analyse_storage,
-        new MenuMetadata(
-            () -> {
-              boolean isAUInstalled =
-                  PackageUtils.Companion.appInstalledOrNot(
-                      AboutActivity.PACKAGE_AMAZE_UTILS, mainActivity.getPackageManager());
-              if (isAUInstalled) {
-                try {
-                  Utils.openURL("amaze://teamamaze.xyz/analyse", mainActivity);
-                } catch (ActivityNotFoundException e) {
-                  mainActivity.startActivity(
-                      new Intent(mainActivity, UtilitiesAliasActivity.class));
-                }
-              } else {
-                mainActivity.startActivity(new Intent(mainActivity, UtilitiesAliasActivity.class));
-              }
-            }),
-        R.drawable.ic_round_analytics_24,
-        null);
-
     // initially load trash bin items with "7" but ones listed they're referred as
     // @link{OpenMode.TRASH_BIN}
     addNewItem(
@@ -598,30 +526,6 @@ public class Drawer implements NavigationView.OnNavigationItemSelectedListener {
         R.string.trash_bin,
         new MenuMetadata("7", true),
         R.drawable.round_delete_outline_24,
-        null);
-
-    addNewItem(
-        menu,
-        LASTGROUP,
-        order++,
-        R.string.apps,
-        new MenuMetadata(
-            () -> {
-              FragmentTransaction transaction2 =
-                  mainActivity.getSupportFragmentManager().beginTransaction();
-              transaction2.replace(R.id.content_frame, new AppsListFragment());
-              mainActivity
-                  .getAppbar()
-                  .getAppbarLayout()
-                  .animate()
-                  .translationY(0)
-                  .setInterpolator(new DecelerateInterpolator(2))
-                  .start();
-              pending_fragmentTransaction = transaction2;
-              if (!isDrawerLocked) close();
-              else onDrawerClosed();
-            }),
-        R.drawable.ic_android_white_24dp,
         null);
 
     addNewItem(

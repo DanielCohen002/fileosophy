@@ -1439,7 +1439,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
       }
     } else {
       popupMenu.getMenu().findItem(R.id.book).setVisible(false);
-      popupMenu.getMenu().findItem(R.id.compress).setVisible(true);
 
       if (description.endsWith(fileExtensionZip)
           || description.endsWith(fileExtensionJar)
@@ -1459,7 +1458,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
           || description.endsWith(fileExtensionLzma)
           || description.endsWith(fileExtensionXz)) {
         popupMenu.getMenu().findItem(R.id.ex).setVisible(true);
-        popupMenu.getMenu().findItem(R.id.compress).setVisible(false);
       }
     }
 
@@ -1467,8 +1465,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
       if (description.endsWith(CryptUtil.CRYPT_EXTENSION)
           || description.endsWith(CryptUtil.AESCRYPT_EXTENSION)) {
         popupMenu.getMenu().findItem(R.id.decrypt).setVisible(true);
-      } else {
-        popupMenu.getMenu().findItem(R.id.encrypt).setVisible(true);
       }
     }
     if (rowItem.getMode() == OpenMode.TRASH_BIN) {
@@ -1476,10 +1472,8 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
       popupMenu.getMenu().findItem(R.id.cut).setVisible(false);
       popupMenu.getMenu().findItem(R.id.cpy).setVisible(false);
       popupMenu.getMenu().findItem(R.id.rename).setVisible(false);
-      popupMenu.getMenu().findItem(R.id.encrypt).setVisible(false);
       popupMenu.getMenu().findItem(R.id.decrypt).setVisible(false);
       popupMenu.getMenu().findItem(R.id.about).setVisible(false);
-      popupMenu.getMenu().findItem(R.id.compress).setVisible(false);
       popupMenu.getMenu().findItem(R.id.share).setVisible(false);
       popupMenu.getMenu().findItem(R.id.ex).setVisible(false);
       popupMenu.getMenu().findItem(R.id.book).setVisible(false);

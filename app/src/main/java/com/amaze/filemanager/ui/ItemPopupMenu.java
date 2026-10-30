@@ -184,53 +184,6 @@ public class ItemPopupMenu extends PopupMenu implements PopupMenu.OnMenuItemClic
       FileUtils.openWith(new File(rowItem.desc), mainActivity, useNewStack);
 
       return true;
-    } else if (item.getItemId() == R.id.encrypt) {
-      final Intent encryptIntent = new Intent(context, EncryptService.class);
-      encryptIntent.putExtra(EncryptService.TAG_OPEN_MODE, rowItem.getMode().ordinal());
-      encryptIntent.putExtra(EncryptService.TAG_SOURCE, rowItem.generateBaseFile());
-
-      final EncryptDecryptUtils.EncryptButtonCallbackInterface
-          encryptButtonCallbackInterfaceAuthenticate =
-              new EncryptDecryptUtils.EncryptButtonCallbackInterface() {
-                @Override
-                public void onButtonPressed(Intent intent, String password)
-                    throws GeneralSecurityException, IOException {
-                  EncryptDecryptUtils.startEncryption(
-                      context, rowItem.generateBaseFile().getPath(), password, intent);
-                }
-              };
-
-      final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-
-      if (!preferences
-          .getString(
-              PreferencesConstants.PREFERENCE_CRYPT_MASTER_PASSWORD,
-              PreferencesConstants.PREFERENCE_CRYPT_MASTER_PASSWORD_DEFAULT)
-          .equals("")) {
-        EncryptWithPresetPasswordSaveAsDialog.show(
-            context,
-            encryptIntent,
-            mainActivity,
-            PreferencesConstants.ENCRYPT_PASSWORD_MASTER,
-            encryptButtonCallbackInterfaceAuthenticate);
-      } else if (preferences.getBoolean(
-          PreferencesConstants.PREFERENCE_CRYPT_FINGERPRINT,
-          PreferencesConstants.PREFERENCE_CRYPT_FINGERPRINT_DEFAULT)) {
-        EncryptWithPresetPasswordSaveAsDialog.show(
-            context,
-            encryptIntent,
-            mainActivity,
-            PreferencesConstants.ENCRYPT_PASSWORD_FINGERPRINT,
-            encryptButtonCallbackInterfaceAuthenticate);
-      } else {
-        EncryptAuthenticateDialog.show(
-            context,
-            encryptIntent,
-            mainActivity,
-            utilitiesProvider.getAppTheme(),
-            encryptButtonCallbackInterfaceAuthenticate);
-      }
-      return true;
     } else if (item.getItemId() == R.id.decrypt) {
       EncryptDecryptUtils.decryptFile(
           context,
@@ -241,12 +194,6 @@ public class ItemPopupMenu extends PopupMenu implements PopupMenu.OnMenuItemClic
           rowItem.generateBaseFile().getParent(context),
           utilitiesProvider,
           false);
-      return true;
-    } else if (item.getItemId() == R.id.compress) {
-      GeneralDialogCreation.showCompressDialog(
-          mainActivity,
-          rowItem.generateBaseFile(),
-          mainActivity.getCurrentMainFragment().getMainFragmentViewModel().getCurrentPath());
       return true;
     } else if (item.getItemId() == R.id.return_select) {
       mainFragment.returnIntentResults(new HybridFileParcelable[] {rowItem.generateBaseFile()});
