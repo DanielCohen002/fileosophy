@@ -22,7 +22,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="MissingTranslation"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">Amaze File Manager</string>
+    <string name="app_name">Pared</string>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
     <string name="icon">icon</string>
@@ -603,7 +603,7 @@
     <string name="channel_name_ftp">Amaze FTP Server</string>
     <string name="channel_description_ftp">Amaze File Manager FTP Server\'s Notifications</string>
 
-    <string name="appbar_name" translatable="false">Amaze</string>
+    <string name="appbar_name" translatable="false">Pared</string>
     <string name="processing">Processing&#8230;</string>
     <string name="failed_no_connection">Failed to load files. Please check your connection.</string>
 

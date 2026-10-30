@@ -22,7 +22,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="MissingTranslation"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">அமேஸ் கோப்பு மேலாளர்</string>
     <string name="drawer_open">ஊடுருவல் பட்டியை திற</string>
     <string name="drawer_close">ஊடுருவல் பட்டியை மூடு</string>
     <string name="icon">படவுரு</string>

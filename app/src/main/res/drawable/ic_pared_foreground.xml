@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- folder with its bottom-right corner trimmed off -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M28,34 H44 L49,40 H80 V63 L70,73 H28 Z" />
+    <!-- the folded-over corner -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.55"
+        android:pathData="M80,63 H70 V73 Z" />
+</vector>

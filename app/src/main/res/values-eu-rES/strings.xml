@@ -22,7 +22,6 @@
 <resources
     xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="MissingTranslation">
-    <string name="app_name">Amaze fitxategi-kudeatzailea</string>
     <string name="drawer_open">Ireki nabigazio tiradera</string>
     <string name="drawer_close">Itxi nabigazio tiradera</string>
     <string name="icon">ikonoa</string>
@@ -511,7 +510,6 @@
     <string name="channel_name_ftp">Amaze FTP zerbitzaria</string>
     <string name="channel_description_ftp">Amaze fitxategi-kudeatzailearen FTP zerbitzariaren jakinarazpenak</string>
 
-    <string name="appbar_name" translatable="false">Amaze</string>
     <string name="processing">Prozesatzen&#8230;</string>
     <string name="failed_no_connection">Huts egin du fitxategiak kargatzean. Egiaztatu zure konexioa.</string>
 

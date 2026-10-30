@@ -19,7 +19,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
     -->
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-  <string name="app_name">Amaze bylų tvarkyklė</string>
   <string name="drawer_open">Atidaryti navigacijos stalčių</string>
   <string name="drawer_close">Uždaryti navigacijos stalčių</string>
     <string name="icon">Ikonėlė</string>

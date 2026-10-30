@@ -22,7 +22,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="MissingTranslation"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">امیز فائل مینیجر</string>
     <string name="drawer_open">نیویگیشن دراز کھولیں</string>
     <string name="drawer_close">نیویگیشن دراز بند کریں</string>
     <string name="icon">آئیکن</string>

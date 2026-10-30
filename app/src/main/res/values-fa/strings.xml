@@ -19,7 +19,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
     -->
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
-  <string name="app_name">فایل منیجر حیرت انگیز</string>
   <string name="drawer_open">باز کردن کشو</string>
   <string name="drawer_close">بستن کشو</string>
     <string name="icon">آیکن</string>

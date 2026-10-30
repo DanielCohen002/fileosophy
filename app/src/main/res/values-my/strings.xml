@@ -22,7 +22,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="MissingTranslation"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">Amaze ဖိုင်မန်နေဂျာ</string>
     <string name="drawer_open">အညွှန်းကိုဖွင့်ရန်</string>
     <string name="drawer_close">အညွှန်းကိုပိတ်ရန်</string>
     <string name="icon">အိုင်ကွန်</string>

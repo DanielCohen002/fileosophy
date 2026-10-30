@@ -22,7 +22,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="MissingTranslation"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">Amaze-bestandsbeheerder</string>
     <string name="drawer_open">Navigatielade openen</string>
     <string name="drawer_close">Navigatielade sluiten</string>
     <string name="icon">pictogram</string>

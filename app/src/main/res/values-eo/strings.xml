@@ -22,7 +22,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="MissingTranslation"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">Dosieresplorilo Amaze</string>
     <string name="drawer_open">Malfermi navigacipanelon</string>
     <string name="drawer_close">Fermi navigacipanelon</string>
     <string name="icon">piktogramo</string>

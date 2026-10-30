@@ -22,7 +22,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="MissingTranslation"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">Amaze</string>
     <string name="drawer_open">Odpri navigacijsko okno</string>
     <string name="drawer_close">Zapri navigacijsko okno</string>
     <string name="icon">ikona</string>

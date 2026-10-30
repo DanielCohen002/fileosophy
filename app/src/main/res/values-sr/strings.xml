@@ -22,7 +22,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="MissingTranslation"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">Амејз менаџер фајлова</string>
     <string name="drawer_open">Отвори фиоку навигације</string>
     <string name="drawer_close">Затвори фиоку навигације</string>
     <string name="icon">икона</string>

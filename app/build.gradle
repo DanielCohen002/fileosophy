@@ -27,7 +27,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.amaze.filemanager"
+        applicationId "app.pared.files"
         minSdkVersion libs.versions.minSdk.get().toInteger()
         targetSdkVersion libs.versions.targetSdk.get().toInteger()
         versionCode 125
@@ -53,7 +53,6 @@ android {
 
     buildTypes {
         debug {
-            applicationIdSuffix ".debug"
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard.cfg'
             testProguardFile 'tests-proguard.cfg'

@@ -22,7 +22,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="MissingTranslation"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="app_name">Administrador de archivos Amaze</string>
     <string name="drawer_open">Abrir panel de navegación</string>
     <string name="drawer_close">Cerrar panel de navegación</string>
     <string name="icon">icono</string>
