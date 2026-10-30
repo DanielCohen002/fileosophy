@@ -189,9 +189,6 @@ dependencies {
     androidTestImplementation libs.commons.net
     androidTestImplementation libs.awaitility
 
-    //Detect memory leaks
-    debugImplementation libs.leakcanary.android
-
     implementation libs.commons.compress
 
     implementation libs.materialdialogs.core

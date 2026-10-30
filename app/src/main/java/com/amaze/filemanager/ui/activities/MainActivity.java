@@ -141,7 +141,6 @@ import com.amaze.filemanager.utils.GenericExtKt;
 import com.amaze.filemanager.utils.MainActivityActionMode;
 import com.amaze.filemanager.utils.MainActivityHelper;
 import com.amaze.filemanager.utils.OTGUtil;
-import com.amaze.filemanager.utils.PackageUtils;
 import com.amaze.filemanager.utils.PreferenceUtils;
 import com.amaze.filemanager.utils.Utils;
 import com.cloudrail.si.CloudRail;
@@ -346,6 +345,18 @@ public class MainActivity extends PermissionsActivity
   @Override
   public void onCreate(final Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+
+    // With predictive back (default when targeting SDK 36) the system no longer calls the
+    // deprecated onBackPressed(), so route back through the dispatcher to keep our handling
+    getOnBackPressedDispatcher()
+        .addCallback(
+            this,
+            new androidx.activity.OnBackPressedCallback(true) {
+              @Override
+              public void handleOnBackPressed() {
+                MainActivity.this.onBackPressed();
+              }
+            });
     setContentView(R.layout.main_toolbar);
 
     intent = getIntent();
@@ -552,6 +563,8 @@ public class MainActivity extends PermissionsActivity
                   if (main != null) ((MainFragment) main).updateTabWithDb(tabHandler.findTab(1));
                   Fragment main1 = tabFragment.getFragmentAtIndex(1);
                   if (main1 != null) ((MainFragment) main1).updateTabWithDb(tabHandler.findTab(2));
+                  Fragment main2 = tabFragment.getFragmentAtIndex(2);
+                  if (main2 != null) ((MainFragment) main2).updateTabWithDb(tabHandler.findTab(3));
                 }
                 getPrefs().edit().putBoolean(PREFERENCE_NEED_TO_SET_HOME, false).commit();
               });
@@ -562,6 +575,8 @@ public class MainActivity extends PermissionsActivity
         if (main != null) ((MainFragment) main).updateList(false);
         Fragment main1 = tabFragment.getFragmentAtIndex(1);
         if (main1 != null) ((MainFragment) main1).updateList(false);
+        Fragment main2 = tabFragment.getFragmentAtIndex(2);
+        if (main2 != null) ((MainFragment) main2).updateList(false);
       }
     }
   }

@@ -81,6 +81,9 @@ public class TabFragment extends Fragment {
 
   private static final String KEY_FRAGMENT_0 = "tab0";
   private static final String KEY_FRAGMENT_1 = "tab1";
+  private static final String KEY_FRAGMENT_2 = "tab2";
+
+  public static final int TAB_COUNT = 3;
 
   private boolean savePaths;
   private FragmentManager fragmentManager;
@@ -159,6 +162,7 @@ public class TabFragment extends Fragment {
       try {
         fragments.add(0, fragmentManager.getFragment(savedInstanceState, KEY_FRAGMENT_0));
         fragments.add(1, fragmentManager.getFragment(savedInstanceState, KEY_FRAGMENT_1));
+        fragments.add(2, fragmentManager.getFragment(savedInstanceState, KEY_FRAGMENT_2));
       } catch (Exception e) {
         LOG.warn("failed to clear fragments", e);
       }
@@ -256,6 +260,9 @@ public class TabFragment extends Fragment {
         if (fragments.get(1) != null && fragments.get(1).isAdded()) {
           fragmentManager.putFragment(outState, KEY_FRAGMENT_1, fragments.get(1));
         }
+        if (fragments.size() > 2 && fragments.get(2) != null && fragments.get(2).isAdded()) {
+          fragmentManager.putFragment(outState, KEY_FRAGMENT_2, fragments.get(2));
+        }
         outState.putInt(KEY_POSITION, viewPager.getCurrentItem());
       } catch (IllegalStateException e) {
         LOG.warn("Failed to save fragment states", e);
@@ -288,8 +295,13 @@ public class TabFragment extends Fragment {
       }
 
       // during the config change
+      // blend first -> second -> back to first, as the third tab reuses the first tab's color
+      float pos = position + positionOffset;
       @ColorInt
-      int color = (int) evaluator.evaluate(position + positionOffset, startColor, endColor);
+      int color =
+          pos <= 1
+              ? (int) evaluator.evaluate(pos, startColor, endColor)
+              : (int) evaluator.evaluate(Math.min(pos - 1, 1f), endColor, startColor);
 
       colorDrawable.setColor(color);
       requireMainActivity().updateViews(colorDrawable);
@@ -422,27 +434,41 @@ public class TabFragment extends Fragment {
       if (addTab) {
         addNewTab(1, currentSecondTab);
         addNewTab(2, currentFirstTab);
+        addNewTab(3, currentFirstTab);
       }
       tabHandler.addTab(new Tab(1, currentSecondTab, currentSecondTab)).blockingAwait();
       tabHandler.addTab(new Tab(2, currentFirstTab, currentFirstTab)).blockingAwait();
+      tabHandler.addTab(new Tab(3, currentFirstTab, currentFirstTab)).blockingAwait();
 
       if (currentFirstTab.equalsIgnoreCase("/")) {
         sharedPrefs.edit().putBoolean(PreferencesConstants.PREFERENCE_ROOTMODE, true).apply();
       }
     } else {
-      if (path != null && path.length() != 0) {
-        if (MainActivity.currentTab == 0) {
-          addTab(tab1, path, hideFabInCurrentMainFragment);
-          addTab(tab2, "", false);
-        }
+      Tab tab3 = tabHandler.findTab(3);
+      if (tab3 == null) {
+        // tabs 1 and 2 exist from an earlier version, so only the third one is missing
+        String thirdTabPath = Utils.isNullOrEmpty(firstTabPath) ? "/" : firstTabPath;
+        tab3 = new Tab(3, thirdTabPath, thirdTabPath);
+        tabHandler.addTab(tab3).blockingAwait();
+      }
 
-        if (MainActivity.currentTab == 1) {
-          addTab(tab1, "", false);
-          addTab(tab2, path, hideFabInCurrentMainFragment);
-        }
+      if (path != null && path.length() != 0) {
+        addTab(
+            tab1,
+            MainActivity.currentTab == 0 ? path : "",
+            MainActivity.currentTab == 0 && hideFabInCurrentMainFragment);
+        addTab(
+            tab2,
+            MainActivity.currentTab == 1 ? path : "",
+            MainActivity.currentTab == 1 && hideFabInCurrentMainFragment);
+        addTab(
+            tab3,
+            MainActivity.currentTab == 2 ? path : "",
+            MainActivity.currentTab == 2 && hideFabInCurrentMainFragment);
       } else {
         addTab(tab1, "", false);
         addTab(tab2, "", false);
+        addTab(tab3, "", false);
       }
     }
   }
@@ -469,12 +495,12 @@ public class TabFragment extends Fragment {
   }
 
   public Fragment getCurrentTabFragment() {
-    if (fragments.size() == 2) return fragments.get(viewPager.getCurrentItem());
+    if (fragments.size() == TAB_COUNT) return fragments.get(viewPager.getCurrentItem());
     else return null;
   }
 
   public Fragment getFragmentAtIndex(int pos) {
-    if (fragments.size() == 2 && pos < 2) return fragments.get(pos);
+    if (fragments.size() == TAB_COUNT && pos < TAB_COUNT) return fragments.get(pos);
     else return null;
   }
 
@@ -540,24 +566,24 @@ public class TabFragment extends Fragment {
       leftPlaceholder.setOnDragListener(
           new TabFragmentSideDragListener(
               () -> {
-                if (viewPager.getCurrentItem() == 1) {
+                if (viewPager.getCurrentItem() > 0) {
                   if (mainFragment != null) {
                     dataUtils.setCheckedItemsList(mainFragment.adapter.getCheckedItems());
                     requireMainActivity().getActionModeHelper().disableActionMode();
                   }
-                  viewPager.setCurrentItem(0, true);
+                  viewPager.setCurrentItem(viewPager.getCurrentItem() - 1, true);
                 }
                 return null;
               }));
       rightPlaceholder.setOnDragListener(
           new TabFragmentSideDragListener(
               () -> {
-                if (viewPager.getCurrentItem() == 0) {
+                if (viewPager.getCurrentItem() < TAB_COUNT - 1) {
                   if (mainFragment != null) {
                     dataUtils.setCheckedItemsList(mainFragment.adapter.getCheckedItems());
                     requireMainActivity().getActionModeHelper().disableActionMode();
                   }
-                  viewPager.setCurrentItem(1, true);
+                  viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true);
                 }
                 return null;
               }));

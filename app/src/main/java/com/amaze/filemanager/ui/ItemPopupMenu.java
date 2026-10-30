@@ -21,21 +21,16 @@
 package com.amaze.filemanager.ui;
 
 import java.io.File;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 
 import com.amaze.filemanager.R;
 import com.amaze.filemanager.adapters.data.LayoutElementParcelable;
-import com.amaze.filemanager.asynchronous.services.EncryptService;
 import com.amaze.filemanager.fileoperations.filesystem.OpenMode;
 import com.amaze.filemanager.filesystem.HybridFileParcelable;
 import com.amaze.filemanager.filesystem.PasteHelper;
 import com.amaze.filemanager.filesystem.files.EncryptDecryptUtils;
 import com.amaze.filemanager.filesystem.files.FileUtils;
 import com.amaze.filemanager.ui.activities.MainActivity;
-import com.amaze.filemanager.ui.dialogs.EncryptAuthenticateDialog;
-import com.amaze.filemanager.ui.dialogs.EncryptWithPresetPasswordSaveAsDialog;
 import com.amaze.filemanager.ui.dialogs.GeneralDialogCreation;
 import com.amaze.filemanager.ui.fragments.MainFragment;
 import com.amaze.filemanager.ui.fragments.preferencefragments.PreferencesConstants;
@@ -43,7 +38,6 @@ import com.amaze.filemanager.ui.provider.UtilitiesProvider;
 import com.amaze.filemanager.utils.DataUtils;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.view.MenuItem;
@@ -54,7 +48,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.documentfile.provider.DocumentFile;
-import androidx.preference.PreferenceManager;
 
 /**
  * This class contains the functionality of the PopupMenu for each file in the MainFragment
