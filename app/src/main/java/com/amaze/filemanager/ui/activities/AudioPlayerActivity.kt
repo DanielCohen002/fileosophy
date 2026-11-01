@@ -35,11 +35,16 @@ import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import android.content.res.ColorStateList
+import android.graphics.drawable.GradientDrawable
+import android.util.TypedValue
+import androidx.preference.PreferenceManager
 import com.amaze.filemanager.R
+import com.amaze.filemanager.ui.activities.superclasses.BasicActivity
+import com.amaze.filemanager.ui.theme.AppTheme
 
 /** Minimal built-in audio player: plays the one file that was opened, with seek and pause. */
-class AudioPlayerActivity : AppCompatActivity() {
+class AudioPlayerActivity : BasicActivity() {
     private var player: MediaPlayer? = null
     private var prepared = false
     private var resumeAfterFocusLoss = false
@@ -91,14 +96,27 @@ class AudioPlayerActivity : AppCompatActivity() {
         }
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 
+        val accent =
+            colorPreference
+                .getCurrentUserColorPreferences(this, PreferenceManager.getDefaultSharedPreferences(this))
+                .accent
+        val (surfaceColor, textColor, secondaryTextColor) =
+            when (appTheme) {
+                AppTheme.LIGHT -> Triple(Color.WHITE, Color.BLACK, Color.DKGRAY)
+                AppTheme.BLACK -> Triple(Color.BLACK, Color.WHITE, Color.LTGRAY)
+                else -> Triple(Color.parseColor("#303030"), Color.WHITE, Color.LTGRAY)
+            }
+
         val title = TextView(this)
         title.text = intent.getStringExtra(EXTRA_TITLE) ?: uri.lastPathSegment?.substringAfterLast('/')
-        title.setTextColor(Color.WHITE)
+        title.setTextColor(textColor)
         title.textSize = 20f
         title.gravity = Gravity.CENTER
         title.setPadding(48, 0, 48, 48)
 
         seekBar = SeekBar(this)
+        seekBar.progressTintList = ColorStateList.valueOf(accent)
+        seekBar.thumbTintList = ColorStateList.valueOf(accent)
         seekBar.setOnSeekBarChangeListener(
             object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(bar: SeekBar, progress: Int, fromUser: Boolean) {
@@ -116,8 +134,8 @@ class AudioPlayerActivity : AppCompatActivity() {
             },
         )
 
-        elapsed = timeText()
-        total = timeText()
+        elapsed = timeText(secondaryTextColor)
+        total = timeText(secondaryTextColor)
         val times = LinearLayout(this)
         times.orientation = LinearLayout.HORIZONTAL
         times.addView(elapsed, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
@@ -126,7 +144,7 @@ class AudioPlayerActivity : AppCompatActivity() {
 
         playPause = ImageButton(this)
         playPause.setBackgroundColor(Color.TRANSPARENT)
-        playPause.setColorFilter(Color.WHITE)
+        playPause.setColorFilter(accent)
         playPause.scaleType = android.widget.ImageView.ScaleType.FIT_CENTER
         playPause.setOnClickListener { togglePlayback() }
         playPause.contentDescription = getString(R.string.audio_play_pause)
@@ -140,16 +158,27 @@ class AudioPlayerActivity : AppCompatActivity() {
         root.addView(times, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
         root.addView(playPause, LinearLayout.LayoutParams(PLAY_BUTTON_SIZE, PLAY_BUTTON_SIZE).apply { topMargin = 48 })
         setContentView(root)
-        // Popup over the file list rather than a full-screen page
+        // Popup over the file list rather than a full-screen page, with rounded corners
+        window.setBackgroundDrawable(
+            GradientDrawable().apply {
+                setColor(surfaceColor)
+                cornerRadius =
+                    TypedValue.applyDimension(
+                        TypedValue.COMPLEX_UNIT_DIP,
+                        CORNER_RADIUS_DP,
+                        resources.displayMetrics,
+                    )
+            },
+        )
         window.setLayout((resources.displayMetrics.widthPixels * POPUP_WIDTH_FRACTION).toInt(), ViewGroup.LayoutParams.WRAP_CONTENT)
         updatePlayPauseIcon()
 
         startPlayback(uri)
     }
 
-    private fun timeText(): TextView {
+    private fun timeText(color: Int): TextView {
         val t = TextView(this)
-        t.setTextColor(Color.LTGRAY)
+        t.setTextColor(color)
         t.text = formatTime(0)
         return t
     }
@@ -231,5 +260,6 @@ class AudioPlayerActivity : AppCompatActivity() {
         private const val PROGRESS_INTERVAL_MS = 250L
         private const val PLAY_BUTTON_SIZE = 220
         private const val POPUP_WIDTH_FRACTION = 0.9f
+        private const val CORNER_RADIUS_DP = 28f
     }
 }
