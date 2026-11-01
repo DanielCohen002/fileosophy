@@ -30,10 +30,10 @@ import org.slf4j.LoggerFactory;
 
 import com.amaze.filemanager.LogHelper;
 import com.amaze.filemanager.R;
+import com.amaze.filemanager.filesystem.files.FileUtils;
 import com.amaze.filemanager.adapters.ContributorAdapter;
 import com.amaze.filemanager.adapters.LanguageAdapter;
 import com.amaze.filemanager.ui.activities.superclasses.ThemedActivity;
-import com.amaze.filemanager.ui.dialogs.share.ShareTask;
 import com.amaze.filemanager.ui.theme.AppTheme;
 import com.amaze.filemanager.utils.Billing;
 import com.amaze.filemanager.utils.DataUtils;
@@ -232,7 +232,7 @@ public class AboutActivity extends ThemedActivity implements View.OnClickListene
                 getApplicationContext(), getApplicationContext().getPackageName(), logFile);
         ArrayList<Uri> logUriList = new ArrayList<>();
         logUriList.add(logUri);
-        new ShareTask(this, logUriList, this.getAppTheme(), getAccent()).execute("*/*");
+        FileUtils.shareUris(this, logUriList, "*/*");
       } catch (Exception e) {
         LOG.warn("failed to share logs", e);
       }

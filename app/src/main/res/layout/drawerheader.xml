@@ -18,6 +18,28 @@
             android:minHeight="@dimen/drawer_header_height"
             android:layout_alignParentStart="true"
             android:layout_alignParentLeft="true"/>
+        <ImageView
+            android:id="@+id/header_logo"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="12dp"
+            android:layout_marginLeft="12dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_fileosophy_foreground" />
+        <TextView
+            android:id="@+id/header_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/header_logo"
+            android:layout_toRightOf="@id/header_logo"
+            android:text="@string/app_name"
+            android:textColor="#F1E6D3"
+            android:textSize="22sp"
+            android:textStyle="bold" />
         <TextView
             android:id="@+id/app_version"
             android:layout_width="wrap_content"
@@ -27,12 +49,12 @@
             android:layout_alignParentLeft="true"
             android:padding="@dimen/md_content_padding_top"
             android:text="@string/app_version"
-            android:textColor="@android:color/white"
-            android:visibility="gone"
+            android:textColor="#F1E6D3"
             android:textSize="@dimen/md_content_textsize"
             />
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/donate"
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/twotone_credit_card_white_48dp"
@@ -45,6 +67,7 @@
             />
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/telegram"
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/ic_telegram_24"
@@ -56,6 +79,7 @@
             />
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/instagram"
+            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:srcCompat="@drawable/ic_instagram_24"

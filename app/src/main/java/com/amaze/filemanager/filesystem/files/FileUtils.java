@@ -54,7 +54,6 @@ import com.amaze.filemanager.ui.activities.superclasses.PermissionsActivity;
 import com.amaze.filemanager.ui.activities.superclasses.PreferenceActivity;
 import com.amaze.filemanager.ui.dialogs.GeneralDialogCreation;
 import com.amaze.filemanager.ui.dialogs.OpenFileDialogFragment;
-import com.amaze.filemanager.ui.dialogs.share.ShareTask;
 import com.amaze.filemanager.ui.fragments.preferencefragments.PreferencesConstants;
 import com.amaze.filemanager.ui.icons.MimeTypes;
 import com.amaze.filemanager.ui.theme.AppTheme;
@@ -336,10 +335,23 @@ public class FileUtils {
     if (isGenericFileType || mime == null) mime = MimeTypes.ALL_MIME_TYPES;
 
     try {
-      new ShareTask(activity, uris, appTheme, fab_skin).execute(mime);
+      shareUris(activity, uris, mime);
     } catch (Exception e) {
       LOG.warn("failed to get share files", e);
     }
+  }
+
+  /** Opens the system share sheet for the given URIs. */
+  public static void shareUris(Activity activity, ArrayList<Uri> uris, String mime) {
+    Intent intent = new Intent(uris.size() == 1 ? Intent.ACTION_SEND : Intent.ACTION_SEND_MULTIPLE);
+    intent.setType(mime);
+    if (uris.size() == 1) {
+      intent.putExtra(Intent.EXTRA_STREAM, uris.get(0));
+    } else {
+      intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, uris);
+    }
+    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+    activity.startActivity(Intent.createChooser(intent, activity.getString(R.string.share)));
   }
 
   public static float readableFileSizeFloat(long size) {

@@ -150,12 +150,8 @@ public class Drawer implements NavigationView.OnNavigationItemSelectedListener {
     telegramImageView = drawerHeaderLayout.findViewById(R.id.telegram);
     instagramImageView = drawerHeaderLayout.findViewById(R.id.instagram);
     appVersion = drawerHeaderLayout.findViewById(R.id.app_version);
-    if (BuildConfig.DEBUG) {
-      appVersion.setVisibility(View.VISIBLE);
-    }
-    donateImageView.setOnClickListener(v -> new Billing(mainActivity));
-    telegramImageView.setOnClickListener(v -> Utils.openTelegramURL(mainActivity));
-    instagramImageView.setOnClickListener(v -> Utils.openInstagramURL(mainActivity));
+    appVersion.setText("v" + BuildConfig.VERSION_NAME);
+    appVersion.setVisibility(View.VISIBLE);
     initDrawerFocusItems();
     /*drawerHeaderView.setOnLongClickListener(
     v -> {
@@ -216,7 +212,7 @@ public class Drawer implements NavigationView.OnNavigationItemSelectedListener {
     mDrawerLayout = mainActivity.findViewById(R.id.drawer_layout);
     // mDrawerLayout.setStatusBarBackgroundColor(Color.parseColor((currentTab==1 ? skinTwo :
     // skin)));
-    drawerHeaderView.setBackgroundResource(R.drawable.amaze_header);
+    drawerHeaderView.setBackgroundResource(R.drawable.leather_header);
     // drawerHeaderParent.setBackgroundColor(Color.parseColor((currentTab==1 ? skinTwo : skin)));
     if (mainActivity.findViewById(R.id.tab_frame) != null) {
       isOnTablet = true;

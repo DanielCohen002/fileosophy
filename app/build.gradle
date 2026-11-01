@@ -31,7 +31,7 @@ android {
         minSdkVersion libs.versions.minSdk.get().toInteger()
         targetSdkVersion libs.versions.targetSdk.get().toInteger()
         versionCode 125
-        versionName "3.11.3"
+        versionName "1.0.0"
         multiDexEnabled true
 
         vectorDrawables.useSupportLibrary = true
