@@ -63,7 +63,7 @@ class BackupPrefsFragment : BasePrefsFragment() {
         val gsonString: String = Gson().toJson(map)
 
         try {
-            val file = File(context?.cacheDir?.absolutePath + File.separator + "amaze_backup.json")
+            val file = File(context?.cacheDir?.absolutePath + File.separator + "fileosophy_backup.json")
 
             val fileWriter = FileWriter(file)
 
