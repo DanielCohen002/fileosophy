@@ -340,6 +340,9 @@ public class MainActivity extends PermissionsActivity
   private static final String INTENT_ACTION_OPEN_QUICK_ACCESS =
       "com.amaze.filemanager.openQuickAccess";
   private static final String INTENT_ACTION_OPEN_RECENT = "com.amaze.filemanager.openRecent";
+  private static final String INTENT_ACTION_OPEN_DOWNLOADS =
+      "com.amaze.filemanager.openDownloads";
+  private static final String INTENT_ACTION_OPEN_HOME = "com.amaze.filemanager.openHome";
   private static final String INTENT_ACTION_OPEN_FTP_SERVER = "com.amaze.filemanager.openFTPServer";
   private static final String INTENT_ACTION_OPEN_APP_MANAGER =
       "com.amaze.filemanager.openAppManager";
@@ -1066,6 +1069,12 @@ public class MainActivity extends PermissionsActivity
         path = "5";
       } else if (INTENT_ACTION_OPEN_RECENT.equals(intent.getAction())) {
         path = "6";
+      } else if (INTENT_ACTION_OPEN_DOWNLOADS.equals(intent.getAction())) {
+        path =
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                .getAbsolutePath();
+      } else if (INTENT_ACTION_OPEN_HOME.equals(intent.getAction())) {
+        path = null;
       }
     }
     Bundle b = new Bundle();

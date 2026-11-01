@@ -4,26 +4,66 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- owl body with ear tufts -->
     <path
         android:fillColor="#C69C6D"
-        android:pathData="M34,40 L37,26 L46,34 Q54,31 62,34 L71,26 L74,40 V62 Q74,78 54,78 Q34,78 34,62 Z" />
-    <!-- eyes -->
+        android:pathData="M32,62 a22,21 0 1,0 44,0 a22,21 0 1,0 -44,0 Z" />
     <path
-        android:fillColor="#F4EBDD"
-        android:pathData="M38,47 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 Z M54,47 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 Z" />
+        android:fillColor="#F1E6D3"
+        android:pathData="M41,66 a13,14 0 1,0 26,0 a13,14 0 1,0 -26,0 Z" />
+    <path
+        android:strokeColor="#C69C6D"
+        android:strokeWidth="1.1"
+        android:pathData="M48.5,60 a2.75,2.75 0 0,0 5.5,0" />
+    <path
+        android:strokeColor="#C69C6D"
+        android:strokeWidth="1.1"
+        android:pathData="M54,60 a2.75,2.75 0 0,0 5.5,0" />
+    <path
+        android:strokeColor="#C69C6D"
+        android:strokeWidth="1.1"
+        android:pathData="M48.5,66 a2.75,2.75 0 0,0 5.5,0" />
+    <path
+        android:strokeColor="#C69C6D"
+        android:strokeWidth="1.1"
+        android:pathData="M54,66 a2.75,2.75 0 0,0 5.5,0" />
+    <path
+        android:strokeColor="#C69C6D"
+        android:strokeWidth="1.1"
+        android:pathData="M48.5,72 a2.75,2.75 0 0,0 5.5,0" />
+    <path
+        android:strokeColor="#C69C6D"
+        android:strokeWidth="1.1"
+        android:pathData="M54,72 a2.75,2.75 0 0,0 5.5,0" />
+    <path
+        android:fillColor="#8A5A2B"
+        android:pathData="M29.5,63 a5,13 0 1,0 10,0 a5,13 0 1,0 -10,0 Z" />
+    <path
+        android:fillColor="#8A5A2B"
+        android:pathData="M68.5,63 a5,13 0 1,0 10,0 a5,13 0 1,0 -10,0 Z" />
+    <path
+        android:fillColor="#C69C6D"
+        android:pathData="M38,31 L38.5,19 L48,26 Z" />
+    <path
+        android:fillColor="#C69C6D"
+        android:pathData="M70,31 L69.5,19 L60,26 Z" />
+    <path
+        android:fillColor="#C69C6D"
+        android:strokeColor="#6B4226"
+        android:strokeWidth="1.8"
+        android:pathData="M35,37 a19,14.5 0 1,0 38,0 a19,14.5 0 1,0 -38,0 Z" />
+    <path
+        android:fillColor="#F1E6D3"
+        android:pathData="M39,36.5 a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 Z M55,36.5 a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0 Z" />
     <path
         android:fillColor="#2A1B12"
-        android:pathData="M43,47 a3.2,3.2 0 1,0 6.4,0 a3.2,3.2 0 1,0 -6.4,0 Z M58.6,47 a3.2,3.2 0 1,0 6.4,0 a3.2,3.2 0 1,0 -6.4,0 Z" />
-    <!-- beak -->
+        android:pathData="M42.8,36.5 a3.2,3.2 0 1,0 6.4,0 a3.2,3.2 0 1,0 -6.4,0 Z M58.8,36.5 a3.2,3.2 0 1,0 6.4,0 a3.2,3.2 0 1,0 -6.4,0 Z" />
     <path
-        android:fillColor="#6B4226"
-        android:pathData="M54,51 L50.5,58 L57.5,58 Z" />
-    <!-- folder held in front -->
+        android:fillColor="#D9822B"
+        android:pathData="M54,40.5 L50.3,47 L57.7,47 Z" />
     <path
-        android:fillColor="#F4EBDD"
-        android:pathData="M30,66 H45 L49,70 H78 V84 H30 Z" />
+        android:fillColor="#E0A030"
+        android:pathData="M41,76 V73 H49 L51,76 H67 V84 H41 Z" />
     <path
-        android:fillColor="#A97C50"
-        android:pathData="M30,73 H78 V74.5 H30 Z" />
+        android:fillColor="#B8801F"
+        android:pathData="M41,79 H67 V80.2 H41 Z" />
 </vector>

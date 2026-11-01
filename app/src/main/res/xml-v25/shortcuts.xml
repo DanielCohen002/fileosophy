@@ -3,6 +3,30 @@
 
     <shortcut
         android:enabled="true"
+        android:icon="@drawable/ic_shortcut_downloads"
+        android:shortcutId="shortcut_downloads"
+        android:shortcutLongLabel="@string/shortcut_downloads"
+        android:shortcutShortLabel="@string/shortcut_downloads">
+        <intent
+            android:action="com.amaze.filemanager.openDownloads"
+            android:targetClass="com.amaze.filemanager.ui.activities.MainActivity"
+            android:targetPackage="app.fileosophy.files" />
+    </shortcut>
+
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_home"
+        android:shortcutId="shortcut_home"
+        android:shortcutLongLabel="@string/home"
+        android:shortcutShortLabel="@string/home">
+        <intent
+            android:action="com.amaze.filemanager.openHome"
+            android:targetClass="com.amaze.filemanager.ui.activities.MainActivity"
+            android:targetPackage="app.fileosophy.files" />
+    </shortcut>
+
+    <shortcut
+        android:enabled="true"
         android:icon="@drawable/ic_shortcut_history"
         android:shortcutId="shortcut_recent"
         android:shortcutLongLabel="@string/recent"
