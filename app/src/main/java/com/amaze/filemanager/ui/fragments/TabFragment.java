@@ -121,10 +121,8 @@ public class TabFragment extends Fragment {
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       indicator = requireActivity().findViewById(R.id.indicator);
-      // a lightened primary color stays visible on the dark leather background
-      indicator.setSelectedColour(
-          androidx.core.graphics.ColorUtils.blendARGB(
-              requireMainActivity().getPrimary(), Color.WHITE, 0.35f));
+      // same color as the home button
+      indicator.setSelectedColour(requireMainActivity().getAccent());
     } else {
       circleDrawable1 = requireActivity().findViewById(R.id.tab_indicator1);
       circleDrawable2 = requireActivity().findViewById(R.id.tab_indicator2);
@@ -512,8 +510,8 @@ public class TabFragment extends Fragment {
   void updateIndicator(int index) {
     if (index != 0 && index != 1) return;
 
-    // follows the theme's primary color; the tab that is not shown is a faded version of it
-    int selectedColor = requireMainActivity().getPrimary();
+    // same color as the home button; the tab that is not shown is a faded version of it
+    int selectedColor = requireMainActivity().getAccent();
     int fadedColor = androidx.core.graphics.ColorUtils.setAlphaComponent(selectedColor, 90);
 
     circleDrawable1.setImageDrawable(new ColorCircleDrawable(index == 0 ? selectedColor : fadedColor));
