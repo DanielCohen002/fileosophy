@@ -121,6 +121,10 @@ public class TabFragment extends Fragment {
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       indicator = requireActivity().findViewById(R.id.indicator);
+      // a lightened primary color stays visible on the dark leather background
+      indicator.setSelectedColour(
+          androidx.core.graphics.ColorUtils.blendARGB(
+              requireMainActivity().getPrimary(), Color.WHITE, 0.35f));
     } else {
       circleDrawable1 = requireActivity().findViewById(R.id.tab_indicator1);
       circleDrawable2 = requireActivity().findViewById(R.id.tab_indicator2);

@@ -165,6 +165,15 @@ public class Indicator extends View implements View.OnAttachStateChangeListener 
     addOnAttachStateChangeListener(this);
   }
 
+  /** Sets the color of the current page's dot; the other dots are a faded version of it. */
+  public void setSelectedColour(int colour) {
+    selectedColour = colour;
+    unselectedColour = Color.argb(80, Color.red(colour), Color.green(colour), Color.blue(colour));
+    unselectedPaint.setColor(unselectedColour);
+    selectedPaint.setColor(selectedColour);
+    invalidate();
+  }
+
   public void setViewPager(ViewPager2 viewPager) {
     this.viewPager = viewPager;
     viewPager.registerOnPageChangeCallback(new OnPageChangeCallbackImpl());
