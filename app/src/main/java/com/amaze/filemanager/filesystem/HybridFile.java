@@ -550,7 +550,8 @@ public class HybridFile {
         || path.equals("3")
         || path.equals("4")
         || path.equals("5")
-        || path.equals("6");
+        || path.equals("6")
+        || path.equals("8");
   }
 
   /** Helper method to get parent path */

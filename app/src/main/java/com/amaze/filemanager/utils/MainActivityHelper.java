@@ -286,6 +286,9 @@ public class MainActivityHelper {
       case 7:
         newPath = mainActivity.getString(R.string.trash_bin);
         break;
+      case 8:
+        newPath = mainActivity.getString(R.string.old_media);
+        break;
     }
     return newPath;
   }

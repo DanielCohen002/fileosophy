@@ -24,6 +24,14 @@
         <item name="android:textColor">#ffffff</item>
     </style>
 
+    <!-- dark text for screens that sit on the light background -->
+    <style name="LightTextOverlay">
+        <item name="android:textColorPrimary">@color/leather_espresso</item>
+        <item name="android:textColorSecondary">@color/leather_secondary_text</item>
+        <item name="android:textColorTertiary">@color/leather_secondary_text</item>
+        <item name="android:textColorHint">@color/leather_secondary_text</item>
+    </style>
+
     <!-- appCompat -->
     <!-- light -->
     <style name="appCompatLight" parent="Theme.AppCompat.Light.NoActionBar">

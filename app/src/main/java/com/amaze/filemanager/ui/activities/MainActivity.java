@@ -371,6 +371,7 @@ public class MainActivity extends PermissionsActivity
   private static final String INTENT_ACTION_OPEN_QUICK_ACCESS =
       "com.amaze.filemanager.openQuickAccess";
   private static final String INTENT_ACTION_OPEN_RECENT = "com.amaze.filemanager.openRecent";
+  public static final String INTENT_ACTION_OPEN_OLD_MEDIA = "com.amaze.filemanager.openOldMedia";
   private static final String INTENT_ACTION_OPEN_DOWNLOADS =
       "com.amaze.filemanager.openDownloads";
   private static final String INTENT_ACTION_OPEN_HOME = "com.amaze.filemanager.openHome";
@@ -1100,6 +1101,8 @@ public class MainActivity extends PermissionsActivity
         path = "5";
       } else if (INTENT_ACTION_OPEN_RECENT.equals(intent.getAction())) {
         path = "6";
+      } else if (INTENT_ACTION_OPEN_OLD_MEDIA.equals(intent.getAction())) {
+        path = "8";
       } else if (INTENT_ACTION_OPEN_DOWNLOADS.equals(intent.getAction())) {
         path =
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
@@ -2059,6 +2062,16 @@ public class MainActivity extends PermissionsActivity
     super.onNewIntent(i);
     intent = i;
     path = i.getStringExtra("path");
+
+    if (INTENT_ACTION_OPEN_OLD_MEDIA.equals(i.getAction())) {
+      final MainFragment mainFragment = getCurrentMainFragment();
+      if (mainFragment != null) {
+        mainFragment.loadlist("8", false, OpenMode.CUSTOM, true);
+      } else {
+        goToMain("8");
+      }
+      return;
+    }
 
     if (path != null) {
       if (new File(path).isDirectory()) {

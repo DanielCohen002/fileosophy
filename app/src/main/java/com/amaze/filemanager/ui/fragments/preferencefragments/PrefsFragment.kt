@@ -27,6 +27,7 @@ import android.widget.Toast
 import androidx.preference.Preference
 import com.amaze.filemanager.R
 import com.amaze.filemanager.ui.activities.AboutActivity
+import com.amaze.filemanager.ui.activities.MainActivity
 import com.amaze.filemanager.utils.Utils
 
 class PrefsFragment : BasePrefsFragment() {
@@ -37,6 +38,15 @@ class PrefsFragment : BasePrefsFragment() {
         rootKey: String?,
     ) {
         setPreferencesFromResource(R.xml.preferences, rootKey)
+
+        findPreference<Preference>("old_media")?.onPreferenceClickListener =
+            Preference.OnPreferenceClickListener {
+                val intent = Intent(activity, MainActivity::class.java)
+                intent.action = MainActivity.INTENT_ACTION_OPEN_OLD_MEDIA
+                activity.finish()
+                startActivity(intent)
+                true
+            }
 
         findPreference<Preference>("appearance")?.onPreferenceClickListener =
             Preference.OnPreferenceClickListener {

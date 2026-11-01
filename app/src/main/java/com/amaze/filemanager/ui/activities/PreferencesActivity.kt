@@ -60,6 +60,9 @@ class PreferencesActivity : ThemedActivity(), FolderChooserDialog.FolderCallback
         }
 
         super.onCreate(savedInstanceState)
+        if (appTheme == AppTheme.LIGHT) {
+            theme.applyStyle(R.style.LightTextOverlay, true)
+        }
         setContentView(R.layout.activity_preferences)
 
         layout = findViewById(R.id.activity_preferences)

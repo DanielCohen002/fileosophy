@@ -51,7 +51,6 @@ import com.amaze.filemanager.ui.activities.MainActivity;
 import com.amaze.filemanager.ui.activities.PreferencesActivity;
 import com.amaze.filemanager.ui.dialogs.GeneralDialogCreation;
 import com.amaze.filemanager.ui.fragments.CloudSheetFragment;
-import com.amaze.filemanager.ui.dialogs.HistoryDialog;
 import com.amaze.filemanager.ui.fragments.MainFragment;
 import com.amaze.filemanager.ui.fragments.preferencefragments.QuickAccessesPrefsFragment;
 import com.amaze.filemanager.ui.theme.AppTheme;
@@ -453,18 +452,6 @@ public class Drawer implements NavigationView.OnNavigationItemSelectedListener {
             R.drawable.ic_history_white_24dp,
             null);
       }
-      addNewItem(
-          menu,
-          QUICKACCESSES_GROUP,
-          order++,
-          R.string.history,
-          new MenuMetadata(
-              () -> {
-                MainFragment current = mainActivity.getCurrentMainFragment();
-                if (current != null) HistoryDialog.showHistoryDialog(mainActivity, current);
-              }),
-          R.drawable.ic_history_white_24dp,
-          null);
       if (quickAccessPref[2]) {
         addNewItem(
             menu,

@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,6 +93,8 @@ public class LoadFilesListTask
     extends AsyncTask<Void, Throwable, Pair<OpenMode, List<LayoutElementParcelable>>> {
 
   private static final Logger LOG = LoggerFactory.getLogger(LoadFilesListTask.class);
+
+  private static final int OLD_MEDIA_AGE_DAYS = 365;
 
   private String path;
   private WeakReference<MainFragment> mainFragmentReference;
@@ -260,6 +263,7 @@ public class LoadFilesListTask
     if (5 == mediaType
         || 6 == mediaType
         || 7 == mediaType
+        || 8 == mediaType
         || mainActivityViewModel.getMediaCacheHash().get(mediaType) == null
         || forceReload) {
       switch (Integer.parseInt(path)) {
@@ -287,10 +291,13 @@ public class LoadFilesListTask
         case 7:
           list = listTrashBinFiles();
           break;
+        case 8:
+          list = listOldMedia();
+          break;
         default:
           throw new IllegalStateException();
       }
-      if (5 != mediaType && 6 != mediaType && 7 != mediaType) {
+      if (5 != mediaType && 6 != mediaType && 7 != mediaType && 8 != mediaType) {
         // not saving recent files in cache
         mainActivityViewModel.getMediaCacheHash().set(mediaType, list);
       }
@@ -628,6 +635,60 @@ public class LoadFilesListTask
     }
     cursor.close();
     return recentFiles;
+  }
+
+  /** Images, videos and audio not modified for {@link #OLD_MEDIA_AGE_DAYS}, oldest first. */
+  private @Nullable List<LayoutElementParcelable> listOldMedia() {
+    final Context context = this.context.get();
+
+    if (context == null) {
+      cancel(true);
+      return null;
+    }
+
+    List<LayoutElementParcelable> oldMedia = new ArrayList<>();
+    final String[] projection = {MediaStore.Files.FileColumns.DATA};
+    final String selection =
+        MediaStore.Files.FileColumns.MEDIA_TYPE
+            + " IN (?, ?, ?) AND "
+            + MediaStore.Files.FileColumns.DATE_MODIFIED
+            + " < ? AND "
+            + MediaStore.Files.FileColumns.DATA
+            + " NOT LIKE ?";
+    final long cutoffSeconds =
+        System.currentTimeMillis() / 1000 - TimeUnit.DAYS.toSeconds(OLD_MEDIA_AGE_DAYS);
+    final String[] selectionArgs =
+        new String[] {
+          String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE),
+          String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO),
+          String.valueOf(MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO),
+          String.valueOf(cutoffSeconds),
+          AppConfig.getTrashBinBasePath() + "%"
+        };
+    try (Cursor cursor =
+        context
+            .getContentResolver()
+            .query(
+                MediaStore.Files.getContentUri("external"),
+                projection,
+                selection,
+                selectionArgs,
+                MediaStore.Files.FileColumns.DATE_MODIFIED + " ASC")) {
+      if (cursor == null) return oldMedia;
+      final int dataColumn = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA);
+      while (cursor.moveToNext()) {
+        String path = cursor.getString(dataColumn);
+        if (path == null) continue;
+        HybridFileParcelable baseFile = RootHelper.generateBaseFile(new File(path), showHiddenFiles);
+        if (baseFile == null) continue;
+        LayoutElementParcelable parcelable = createListParcelables(baseFile);
+        if (parcelable != null) oldMedia.add(parcelable);
+      }
+    } catch (SecurityException e) {
+      // Storage permission denied; treat as no old media instead of crashing.
+      LOG.warn("no permission to list old media", e);
+    }
+    return oldMedia;
   }
 
   private @Nullable List<LayoutElementParcelable> listTrashBinFiles() {

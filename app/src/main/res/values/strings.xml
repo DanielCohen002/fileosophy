@@ -878,6 +878,8 @@ You only need to do this once, until the next time you select a new location for
     <string name="error.listfile.smb">Error listing files at %s: %s</string>
     <string name="error.listfile.smb.noipcshare">Error listing files at %s - probably the SMB server does not allow anonymous access to the IPC$ share. You may try specifying the share name directly in connection settings.</string>
     <string name="trash_bin">Trash Bin</string>
+    <string name="old_media">Old media</string>
+    <string name="old_media_summary">Images, videos and audio not modified in over a year</string>
     <string name="clear_trash">Clear trash</string>
     <string name="question_clear_trash">Permanently delete everything in the trash bin?</string>
     <string name="delete_permanently_checkbox">Delete Permanently</string>

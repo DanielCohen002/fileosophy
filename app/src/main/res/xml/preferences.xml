@@ -22,6 +22,13 @@
     <Preference
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:icon="@drawable/ic_preference_old_media"
+        app:key="old_media"
+        app:summary="@string/old_media_summary"
+        app:title="@string/old_media" />
+    <Preference
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:icon="@drawable/ic_preference_appearance"
         app:key="appearance"
         app:summary="@string/appearance_summary"
