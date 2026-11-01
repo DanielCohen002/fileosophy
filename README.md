@@ -8,13 +8,18 @@ actually use.
 
 ## What's different from Amaze
 
-- **Share first.** Sharing uses the standard Android share sheet and sits at the top of the menus.
-- **Lean menus.** No FTP server, Wi-Fi P2P, compress or encrypt entries; the sidebar and action
-  menus are trimmed.
+- **Share first.** Sharing opens the standard Android share sheet and sits at the top of the menus.
+- **Lean menus.** No FTP server, Wi-Fi P2P, compress, encrypt or App Manager entries.
 - **Three windows** to move files between.
-- **Sensible defaults.** Drag to select several items, no delete confirmation, and the
-  Images / Videos / Audio / Documents / APK shortcuts hidden in the sidebar (all can be turned back
-  on in Settings).
+- **Simple navigation.** The bottom-right button is a Home button that jumps back to the root. The
+  3-dot menu has an **Add** section for new folders and files, and the sort button is a pair of
+  arrows.
+- **Tidy sidebar.** No Quick access item; **History** sits under **Recent files**. The
+  Images / Videos / Audio / Documents / APK shortcuts are hidden by default (turn them back on in
+  Settings).
+- **Sensible defaults.** Drag to select several items, and no delete confirmation. The **Hidden
+  Files** manager lives in Settings > Behavior.
+- **Launcher shortcuts.** Long-press the icon for Downloads, Home and Recent files.
 - **Leather theme.** Saddle-brown toolbars, a cream light theme and an espresso dark theme, with a
   subtle leather grain.
 - **Own identity.** Its own name, owl icon and application id (`app.fileosophy.files`), so it
@@ -22,9 +27,11 @@ actually use.
 
 ## Download
 
-Grab the latest APK from the [Releases page](https://github.com/DanielCohen002/fileosophy/releases) and install it on your phone
-(you may need to allow installs from your browser). Releases are marked pre-release while the app
-is still changing.
+Get the latest `Fileosophy-<version>.apk` from the
+[Releases page](https://github.com/DanielCohen002/fileosophy/releases) and open it on your phone.
+You may need to allow installs from your browser or file manager. Google Play Protect can show an
+"App scan recommended" prompt because the app isn't from the Play Store: choose **Install without
+scanning** (or **Scan app**).
 
 ## Build
 
