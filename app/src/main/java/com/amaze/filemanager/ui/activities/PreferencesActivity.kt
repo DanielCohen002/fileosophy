@@ -24,6 +24,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -69,6 +70,15 @@ class PreferencesActivity : ThemedActivity(), FolderChooserDialog.FolderCallback
             ActionBar.DISPLAY_HOME_AS_UP or ActionBar.DISPLAY_SHOW_TITLE
         initStatusBarResources(layout)
 
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    goBack()
+                }
+            },
+        )
+
         if (savedInstanceState == null) {
             val fragment = PrefsFragment()
             supportFragmentManager
@@ -79,6 +89,10 @@ class PreferencesActivity : ThemedActivity(), FolderChooserDialog.FolderCallback
     }
 
     override fun onBackPressed() {
+        goBack()
+    }
+
+    private fun goBack() {
         if (supportFragmentManager.backStackEntryCount > 0) {
             supportFragmentManager.popBackStack()
             return

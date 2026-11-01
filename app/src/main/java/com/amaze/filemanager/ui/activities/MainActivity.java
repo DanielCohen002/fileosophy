@@ -1312,8 +1312,10 @@ public class MainActivity extends PermissionsActivity
                                   UtilsHandler.Operation.LIST, mainFragment.getCurrentPath()));
                         });
               }
-              utilsHandler.saveToDatabase(
-                  new OperationData(UtilsHandler.Operation.GRID, mainFragment.getCurrentPath()));
+              utilsHandler
+                  .saveToDatabase(
+                      new OperationData(UtilsHandler.Operation.GRID, mainFragment.getCurrentPath()))
+                  .subscribe();
 
               dataUtils.setPathAsGridOrList(mainFragment.getCurrentPath(), DataUtils.GRID);
             } else {
@@ -1327,8 +1329,10 @@ public class MainActivity extends PermissionsActivity
                         });
               }
 
-              utilsHandler.saveToDatabase(
-                  new OperationData(UtilsHandler.Operation.LIST, mainFragment.getCurrentPath()));
+              utilsHandler
+                  .saveToDatabase(
+                      new OperationData(UtilsHandler.Operation.LIST, mainFragment.getCurrentPath()))
+                  .subscribe();
 
               dataUtils.setPathAsGridOrList(mainFragment.getCurrentPath(), DataUtils.LIST);
             }

@@ -41,7 +41,7 @@ public class SaveOnDataUtilsChange implements DataUtils.DataChangeListener {
 
   @Override
   public void onHiddenFileAdded(String path) {
-    utilsHandler.saveToDatabase(new OperationData(UtilsHandler.Operation.HIDDEN, path));
+    utilsHandler.saveToDatabase(new OperationData(UtilsHandler.Operation.HIDDEN, path)).subscribe();
   }
 
   @Override
@@ -51,13 +51,14 @@ public class SaveOnDataUtilsChange implements DataUtils.DataChangeListener {
 
   @Override
   public void onHistoryAdded(String path) {
-    utilsHandler.saveToDatabase(new OperationData(UtilsHandler.Operation.HISTORY, path));
+    utilsHandler.saveToDatabase(new OperationData(UtilsHandler.Operation.HISTORY, path)).subscribe();
   }
 
   @Override
   public void onBookAdded(String[] path, boolean refreshdrawer) {
-    utilsHandler.saveToDatabase(
-        new OperationData(UtilsHandler.Operation.BOOKMARKS, path[0], path[1]));
+    utilsHandler
+        .saveToDatabase(new OperationData(UtilsHandler.Operation.BOOKMARKS, path[0], path[1]))
+        .subscribe();
     if (refreshdrawer) {
       final Drawer drawer = this.drawer.get();
       if (drawer != null) {

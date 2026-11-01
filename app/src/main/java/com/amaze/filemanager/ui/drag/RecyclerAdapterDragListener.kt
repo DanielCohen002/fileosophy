@@ -22,6 +22,7 @@ package com.amaze.filemanager.ui.drag
 
 import android.util.Log
 import android.view.DragEvent
+import com.amaze.filemanager.utils.Haptics
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.amaze.filemanager.adapters.RecyclerAdapter
@@ -85,6 +86,7 @@ class RecyclerAdapterDragListener(
                                         holder.checkImageViewGrid
                                     },
                                 )
+                                Haptics.click(holder.baseItemView.context)
                             }
                         } else {
                             val currentElement = listItem.layoutElementParcelable
