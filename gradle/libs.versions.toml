@@ -9,7 +9,6 @@ ndk = "30.0.16248370" #r30
 jacocoAndroid = "0.2.1"
 gradle = "8.13.2"
 
-easylauncher = "6.1.0"
 legacySupportV13 = "1.0.0"
 systembartint = "1.0.4"
 robolectric = "4.16.1"
@@ -147,7 +146,6 @@ room-migration = { module = "androidx.room:room-migration", version.ref = "room"
 commons-compress = { module = "org.apache.commons:commons-compress", version.ref = "commonsCompress" }
 commons-net = { module = "commons-net:commons-net", version.ref = "commonsNet" }
 
-easylauncher = { module = "com.project.starter:easylauncher", version.ref = "easylauncher" }
 materialdialogs-core = { module = "com.afollestad.material-dialogs:core", version.ref = "materialDialogs" }
 materialdialogs-commons = { module = "com.afollestad.material-dialogs:commons", version.ref = "materialDialogs" }
 mpAndroidChart = { module = "com.github.PhilJay:MPAndroidChart", version.ref = "mpAndroidChart" }
