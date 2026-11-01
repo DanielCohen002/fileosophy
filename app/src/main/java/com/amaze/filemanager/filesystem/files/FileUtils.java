@@ -50,6 +50,7 @@ import com.amaze.filemanager.filesystem.cloud.CloudUtil;
 import com.amaze.filemanager.filesystem.compressed.CompressedHelper;
 import com.amaze.filemanager.ui.activities.DatabaseViewerActivity;
 import com.amaze.filemanager.ui.activities.MainActivity;
+import com.amaze.filemanager.ui.activities.PdfViewerActivity;
 import com.amaze.filemanager.ui.activities.superclasses.PermissionsActivity;
 import com.amaze.filemanager.ui.activities.superclasses.PreferenceActivity;
 import com.amaze.filemanager.ui.dialogs.GeneralDialogCreation;
@@ -699,6 +700,11 @@ public class FileUtils {
       GeneralDialogCreation.showPackageDialog(f, mainActivity);
     } else if (defaultHandler && CompressedHelper.isFileExtractable(f.getPath())) {
       GeneralDialogCreation.showArchiveDialog(f, mainActivity);
+    } else if (f.getName().toLowerCase().endsWith(".pdf")) {
+      openPdfViewer(
+          FileProvider.getUriForFile(mainActivity, mainActivity.getPackageName(), f),
+          f.getName(),
+          mainActivity);
     } else if (defaultHandler && f.getName().toLowerCase().endsWith(".db")) {
       Intent intent = new Intent(mainActivity, DatabaseViewerActivity.class);
       intent.setType(MimeTypes.getMimeType(f.getPath(), false));
@@ -714,6 +720,15 @@ public class FileUtils {
         openWith(f, mainActivity, useNewStack);
       }
     }
+  }
+
+  private static void openPdfViewer(
+      @NonNull Uri uri, @NonNull String title, @NonNull MainActivity mainActivity) {
+    Intent intent = new Intent(mainActivity, PdfViewerActivity.class);
+    intent.setData(uri);
+    intent.putExtra(PdfViewerActivity.EXTRA_TITLE, title);
+    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+    mainActivity.startActivity(intent);
   }
 
   private static void openFileDialogFragmentFor(
@@ -772,6 +787,10 @@ public class FileUtils {
       final DocumentFile f, final MainActivity m, SharedPreferences sharedPrefs) {
     boolean useNewStack =
         sharedPrefs.getBoolean(PreferencesConstants.PREFERENCE_TEXTEDITOR_NEWSTACK, false);
+    if (f.getName() != null && f.getName().toLowerCase().endsWith(".pdf")) {
+      openPdfViewer(f.getUri(), f.getName(), m);
+      return;
+    }
     try {
       openFileDialogFragmentFor(f, m, useNewStack);
     } catch (Exception e) {

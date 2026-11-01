@@ -824,6 +824,9 @@ You only need to do this once, until the next time you select a new location for
     <string name="image_viewer">Amaze Image Viewer</string>
     <string name="video_player">Amaze Video Player</string>
     <string name="amaze_audio_player">Amaze Music Player</string>
+    <string name="pdf_page_indicator">%1$d / %2$d</string>
+    <string name="pdf_password_protected">Password-protected PDFs can\'t be opened in the built-in reader</string>
+    <string name="pdf_open_failed">Couldn\'t open this PDF</string>
     <string name="pdf_viewer">Amaze Document Viewer</string>
     <string name="docx_viewer">Amaze Document Viewer</string>
     <string name="share_logs">Share logs</string>
