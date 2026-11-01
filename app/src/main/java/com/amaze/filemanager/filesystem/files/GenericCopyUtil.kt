@@ -108,7 +108,7 @@ class GenericCopyUtil(
                         if (sourceFile.isDocumentFile) {
                             OTGUtil.getDocumentFile(
                                 sourceFile.path,
-                                SafRootHolder.uriRoot!!,
+                                SafRootHolder.uriRoot,
                                 context,
                                 if (sourceFile.isOtgFile) OpenMode.OTG else OpenMode.DOCUMENT_FILE,
                                 false,
@@ -185,7 +185,7 @@ class GenericCopyUtil(
                         if (targetFile.isDocumentFile) {
                             OTGUtil.getDocumentFile(
                                 targetFile.path,
-                                SafRootHolder.uriRoot!!,
+                                SafRootHolder.uriRoot,
                                 context,
                                 if (targetFile.isOtgFile) OpenMode.OTG else OpenMode.DOCUMENT_FILE,
                                 true,

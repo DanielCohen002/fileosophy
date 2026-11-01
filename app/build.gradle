@@ -30,8 +30,8 @@ android {
         applicationId "app.fileosophy.files"
         minSdkVersion libs.versions.minSdk.get().toInteger()
         targetSdkVersion libs.versions.targetSdk.get().toInteger()
-        versionCode 131
-        versionName "1.3.0"
+        versionCode 132
+        versionName "1.3.1"
         multiDexEnabled true
 
         vectorDrawables.useSupportLibrary = true
@@ -131,6 +131,8 @@ dependencies {
     }
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
+    // 1.0.0 resolves any document inside a picked tree to the tree root (deleting a file deleted the folder)
+    implementation 'androidx.documentfile:documentfile:1.0.1'
     implementation libs.systembarTint
 
     implementation libs.androidX.activity

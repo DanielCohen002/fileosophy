@@ -52,6 +52,7 @@ import com.amaze.filemanager.filesystem.FileProperties;
 import com.amaze.filemanager.filesystem.HybridFile;
 import com.amaze.filemanager.filesystem.HybridFileParcelable;
 import com.amaze.filemanager.filesystem.Operations;
+import com.amaze.filemanager.filesystem.CloudSaf;
 import com.amaze.filemanager.filesystem.SafRootHolder;
 import com.amaze.filemanager.filesystem.compressed.CompressedHelper;
 import com.amaze.filemanager.filesystem.compressed.showcontents.Decompressor;
@@ -452,6 +453,7 @@ public class MainActivityHelper {
       int result = NetCopyClientUtils.INSTANCE.checkFolder(path);
       return result;
     } else if (OpenMode.DOCUMENT_FILE.equals(openMode)) {
+      if (CloudSaf.isCloudUri(path)) return WRITABLE_OR_ON_SDCARD;
       DocumentFile d =
           DocumentFile.fromTreeUri(AppConfig.getInstance(), SafRootHolder.getUriRoot());
       if (d == null) return DOESNT_EXIST;

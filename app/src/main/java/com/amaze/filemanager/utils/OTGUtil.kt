@@ -162,10 +162,8 @@ object OTGUtil {
         context: Context,
         fileFound: OnFileFound,
     ) {
-        val folder = CloudSaf.resolve(context, path, false) ?: throw DocumentFileNotFoundException(
-            CloudSaf.rootOf(path),
-            path,
-        )
+        // a folder that is gone (deleted, or access lost) just shows up empty instead of crashing
+        val folder = CloudSaf.resolve(context, path, false) ?: return
         for (file in folder.listFiles()) {
             val childPath = file.uri.toString()
             CloudSaf.rememberParent(childPath, path)

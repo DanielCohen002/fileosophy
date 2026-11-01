@@ -61,7 +61,7 @@ public class AppBar {
     /* For SearchView, see onCreateOptionsMenu(Menu menu)*/
     TOOLBAR_START_INSET = toolbar.getContentInsetStart();
 
-    if (!sharedPref.getBoolean(PreferencesConstants.PREFERENCE_INTELLI_HIDE_TOOLBAR, true)) {
+    if (!sharedPref.getBoolean(PreferencesConstants.PREFERENCE_INTELLI_HIDE_TOOLBAR, false)) {
       AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) toolbar.getLayoutParams();
       params.setScrollFlags(0);
       appbarLayout.setExpanded(true, true);

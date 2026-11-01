@@ -78,7 +78,11 @@ object CloudSaf {
             if (!create) return null
             return parentDoc.createFile(guessMime(name), name)
         }
-        val doc = DocumentFile.fromTreeUri(context, Uri.parse(path)) ?: return null
+        val requested = Uri.parse(path)
+        val doc = DocumentFile.fromTreeUri(context, requested) ?: return null
+        // safety net: never hand back a different document than asked for (e.g. the whole folder
+        // when a single file was requested), because the caller may delete or overwrite it
+        if (requested.pathSegments.size == 4 && doc.uri != requested) return null
         return if (doc.exists()) doc else null
     }
 }

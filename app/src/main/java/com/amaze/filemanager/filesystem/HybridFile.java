@@ -861,6 +861,11 @@ public class HybridFile {
         size = returnValue == null ? 0L : returnValue;
         break;
       case DOCUMENT_FILE:
+        if (CloudSaf.isCloudUri(path)) {
+          // the provider does not report free space; do not block the copy
+          size = Long.MAX_VALUE;
+          break;
+        }
         size =
             FileProperties.getDeviceStorageRemainingSpace(SafRootHolder.INSTANCE.getVolumeLabel());
         break;
