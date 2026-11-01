@@ -182,7 +182,7 @@ public class HybridFile {
       mode = OpenMode.OTG;
     } else if (path.startsWith(FTP_URI_PREFIX) || path.startsWith(FTPS_URI_PREFIX)) {
       mode = OpenMode.FTP;
-    } else if (path.startsWith(DOCUMENT_FILE_PREFIX)) {
+    } else if (path.startsWith(DOCUMENT_FILE_PREFIX) || CloudSaf.isCloudUri(path)) {
       mode = OpenMode.DOCUMENT_FILE;
     } else if (isCustomPath()) {
       mode = OpenMode.CUSTOM;
@@ -570,6 +570,9 @@ public class HybridFile {
         return "7";
       case SFTP:
       case DOCUMENT_FILE:
+        if (mode == OpenMode.DOCUMENT_FILE && CloudSaf.isCloudUri(path)) {
+          return CloudSaf.parentOf(path);
+        }
         String thisPath = path;
         if (thisPath.contains("%")) {
           try {

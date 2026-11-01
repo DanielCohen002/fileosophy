@@ -56,6 +56,7 @@ import com.amaze.filemanager.database.models.explorer.Tab;
 import com.amaze.filemanager.fileoperations.filesystem.OpenMode;
 import com.amaze.filemanager.filesystem.CustomFileObserver;
 import com.amaze.filemanager.filesystem.FileProperties;
+import com.amaze.filemanager.filesystem.CloudSaf;
 import com.amaze.filemanager.filesystem.HybridFile;
 import com.amaze.filemanager.filesystem.HybridFileParcelable;
 import com.amaze.filemanager.filesystem.MediaStoreHack;
@@ -1167,6 +1168,14 @@ public class MainFragment extends Fragment
             parent = mainFragmentViewModel.getHome(); // fall back by traversing back to home folder
 
           loadlist(parent, true, mainFragmentViewModel.getOpenMode(), false);
+        }
+      } else if (OpenMode.DOCUMENT_FILE.equals(mainFragmentViewModel.getOpenMode())
+          && CloudSaf.isCloudUri(currentFile.getPath())) {
+        String cloudParent = CloudSaf.parentOf(currentFile.getPath());
+        if (cloudParent == null) {
+          loadlist(mainFragmentViewModel.getHome(), false, OpenMode.FILE, false);
+        } else {
+          loadlist(cloudParent, true, OpenMode.DOCUMENT_FILE, false);
         }
       } else if (OpenMode.FTP.equals(mainFragmentViewModel.getOpenMode())) {
         if (mainFragmentViewModel.getCurrentPath() != null) {

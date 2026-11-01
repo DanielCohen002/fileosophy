@@ -607,6 +607,8 @@
     <string name="shortcut_downloads" translatable="false">Downloads</string>
     <string name="reorder_bookmarks" translatable="false">Reorder bookmarks</string>
     <string name="reorder_bookmarks_hint" translatable="false">Press and hold a bookmark, then drag it up or down.</string>
+    <string name="add_cloud_storage" translatable="false">Cloud storage (Drive, Dropbox...)</string>
+    <string name="cloud_storage_added" translatable="false">Cloud storage added to the sidebar</string>
     <string name="menu_add" translatable="false">Add</string>
     <string name="appbar_name" translatable="false">Fileosophy</string>
     <string name="processing">Processing&#8230;</string>

@@ -35,6 +35,7 @@ import com.amaze.filemanager.exceptions.DocumentFileNotFoundException
 import com.amaze.filemanager.fileoperations.filesystem.OpenMode
 import com.amaze.filemanager.fileoperations.filesystem.usb.SingletonUsbOtg
 import com.amaze.filemanager.fileoperations.filesystem.usb.UsbOtgRepresentation
+import com.amaze.filemanager.filesystem.CloudSaf
 import com.amaze.filemanager.filesystem.HybridFileParcelable
 import com.amaze.filemanager.filesystem.RootHelper
 import java.net.URLDecoder
@@ -100,17 +101,22 @@ object OTGUtil {
 
     @JvmStatic
     fun getDocumentFiles(
-        rootUriString: Uri,
+        rootUriString: Uri?,
         path: String,
         context: Context,
         openMode: OpenMode,
         fileFound: OnFileFound,
     ) {
-        var rootUri = DocumentFile.fromTreeUri(context, rootUriString)
+        if (openMode == OpenMode.DOCUMENT_FILE && CloudSaf.isCloudUri(path)) {
+            listCloud(path, context, fileFound)
+            return
+        }
+        val rootTree = rootUriString ?: throw NullPointerException("Document root not set!")
+        var rootUri = DocumentFile.fromTreeUri(context, rootTree)
 
         val parts: Array<String> =
             if (openMode == OpenMode.DOCUMENT_FILE) {
-                path.substringAfter(rootUriString.toString())
+                path.substringAfter(rootTree.toString())
                     .split("/", PATH_SEPARATOR_ENCODED).toTypedArray()
             } else {
                 path.split("/").toTypedArray()
@@ -125,7 +131,7 @@ object OTGUtil {
         }
 
         if (rootUri == null) {
-            throw DocumentFileNotFoundException(rootUriString, path)
+            throw DocumentFileNotFoundException(rootTree, path)
         }
 
         // we have the end point DocumentFile, list the files inside it and return
@@ -147,6 +153,36 @@ object OTGUtil {
                 baseFile.fullUri = file.uri
                 fileFound.onFileFound(baseFile)
             }
+        }
+    }
+
+    /** Lists a folder of a cloud provider reached through the document picker. */
+    private fun listCloud(
+        path: String,
+        context: Context,
+        fileFound: OnFileFound,
+    ) {
+        val folder = CloudSaf.resolve(context, path, false) ?: throw DocumentFileNotFoundException(
+            CloudSaf.rootOf(path),
+            path,
+        )
+        for (file in folder.listFiles()) {
+            val childPath = file.uri.toString()
+            CloudSaf.rememberParent(childPath, path)
+            var size: Long = 0
+            if (!file.isDirectory) size = file.length()
+            val baseFile =
+                HybridFileParcelable(
+                    childPath,
+                    RootHelper.parseDocumentFilePermission(file),
+                    file.lastModified(),
+                    size,
+                    file.isDirectory,
+                )
+            baseFile.name = file.name
+            baseFile.mode = OpenMode.DOCUMENT_FILE
+            baseFile.fullUri = file.uri
+            fileFound.onFileFound(baseFile)
         }
     }
 
@@ -172,11 +208,15 @@ object OTGUtil {
     @JvmStatic
     fun getDocumentFile(
         path: String,
-        rootUri: Uri,
+        rootUri: Uri?,
         context: Context,
         openMode: OpenMode,
         createRecursive: Boolean,
     ): DocumentFile? {
+        if (openMode == OpenMode.DOCUMENT_FILE && CloudSaf.isCloudUri(path)) {
+            return CloudSaf.resolve(context, path, createRecursive)
+        }
+        if (rootUri == null) throw NullPointerException("Document root not set!")
         // start with root of SD card and then parse through document tree.
         var retval: DocumentFile? =
             DocumentFile.fromTreeUri(context, rootUri)

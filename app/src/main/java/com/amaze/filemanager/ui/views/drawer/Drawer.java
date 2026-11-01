@@ -717,7 +717,8 @@ public class Drawer implements NavigationView.OnNavigationItemSelectedListener {
 
     switch (meta.type) {
       case MenuMetadata.ITEM_ENTRY:
-        if (dataUtils.containsBooks(new String[] {title, meta.path}) != -1) {
+        if (!meta.path.startsWith("content://")
+            && dataUtils.containsBooks(new String[] {title, meta.path}) != -1) {
           FileUtils.checkForPath(mainActivity, meta.path, mainActivity.isRootExplorer());
         }
 

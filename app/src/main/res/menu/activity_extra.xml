@@ -57,6 +57,9 @@
             <item
                 android:id="@+id/add_file"
                 android:title="@string/file" />
+            <item
+                android:id="@+id/add_cloud"
+                android:title="@string/add_cloud_storage" />
         </menu>
     </item>
     <item

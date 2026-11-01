@@ -334,6 +334,40 @@ public class MainActivity extends PermissionsActivity
 
   private static final String DEFAULT_FALLBACK_STORAGE_PATH = "/storage/sdcard0";
   private static final String INTERNAL_SHARED_STORAGE = "Internal shared storage";
+  /** Lets the user pick a cloud provider (Drive, Dropbox...) through Android's document picker. */
+  private final androidx.activity.result.ActivityResultLauncher<Intent> cloudTreeLauncher =
+      registerForActivityResult(
+          new androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult(),
+          result -> {
+            Uri tree = result.getData() != null ? result.getData().getData() : null;
+            if (tree == null) return;
+            try {
+              getContentResolver()
+                  .takePersistableUriPermission(
+                      tree,
+                      Intent.FLAG_GRANT_READ_URI_PERMISSION
+                          | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            } catch (Exception e) {
+              LOG.warn("could not keep access to the chosen cloud storage", e);
+            }
+            String name = null;
+            androidx.documentfile.provider.DocumentFile root =
+                androidx.documentfile.provider.DocumentFile.fromTreeUri(this, tree);
+            if (root != null) name = root.getName();
+            android.content.pm.ProviderInfo provider =
+                getPackageManager().resolveContentProvider(tree.getAuthority(), 0);
+            if (provider != null) {
+              String app = provider.loadLabel(getPackageManager()).toString();
+              name = (name == null || name.isEmpty() || name.equals(app)) ? app : app + ": " + name;
+            }
+            if (name == null || name.isEmpty()) name = "Cloud";
+            if (dataUtils.addBook(new String[] {name, tree.toString()}, true)) {
+              Toast.makeText(this, R.string.cloud_storage_added, Toast.LENGTH_LONG).show();
+            } else {
+              Toast.makeText(this, R.string.bookmark_exists, Toast.LENGTH_LONG).show();
+            }
+          });
+
   private static final String INTENT_ACTION_OPEN_QUICK_ACCESS =
       "com.amaze.filemanager.openQuickAccess";
   private static final String INTENT_ACTION_OPEN_RECENT = "com.amaze.filemanager.openRecent";
@@ -1233,6 +1267,8 @@ public class MainActivity extends PermissionsActivity
                 mainFragment.getMainFragmentViewModel().getOpenMode(),
                 mainFragment.getCurrentPath(),
                 mainFragment);
+          } else if (item.getItemId() == R.id.add_cloud) {
+            cloudTreeLauncher.launch(new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE));
           } else if (item.getItemId() == R.id.add_file) {
             mainActivityHelper.mkfile(
                 mainFragment.getMainFragmentViewModel().getOpenMode(),
