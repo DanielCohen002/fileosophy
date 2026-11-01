@@ -10,10 +10,6 @@
         app:summary="@string/thumb_summary"
         app:title="@string/thumb" />
     <com.amaze.filemanager.ui.views.preference.CheckBox
-        app:defaultValue="false"
-        app:key="showHidden"
-        app:title="@string/hidden" />
-    <com.amaze.filemanager.ui.views.preference.CheckBox
         app:defaultValue="true"
         app:key="showLastModified"
         app:summary="@string/lastModifiedSummary"

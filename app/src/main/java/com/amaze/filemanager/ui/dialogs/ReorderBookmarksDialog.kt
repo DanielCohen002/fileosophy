@@ -2,6 +2,7 @@ package com.amaze.filemanager.ui.dialogs
 
 import android.app.Activity
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -23,6 +24,13 @@ object ReorderBookmarksDialog {
 
         val density = activity.resources.displayMetrics.density
         val pad = (16 * density).toInt()
+
+        val hint = TextView(activity)
+        hint.setText(R.string.reorder_bookmarks_hint)
+        hint.setPadding(pad, pad / 2, pad, pad / 2)
+        val container = LinearLayout(activity)
+        container.orientation = LinearLayout.VERTICAL
+        container.addView(hint)
 
         val recycler = RecyclerView(activity)
         recycler.layoutManager = LinearLayoutManager(activity)
@@ -58,6 +66,7 @@ object ReorderBookmarksDialog {
                 }
             }
         recycler.adapter = adapter
+        container.addView(recycler)
         ItemTouchHelper(
             object : ItemTouchHelper.SimpleCallback(
                 ItemTouchHelper.UP or ItemTouchHelper.DOWN,
@@ -82,8 +91,7 @@ object ReorderBookmarksDialog {
 
         MaterialDialog.Builder(activity)
             .title(R.string.reorder_bookmarks)
-            .content(R.string.reorder_bookmarks_hint)
-            .customView(recycler, false)
+            .customView(container, false)
             .positiveText(R.string.done)
             .negativeText(R.string.cancel)
             .onPositive { _, _ -> BookmarkOrder.save(prefs, items) }

@@ -334,9 +334,6 @@ public class MainActivity extends PermissionsActivity
 
   private static final String DEFAULT_FALLBACK_STORAGE_PATH = "/storage/sdcard0";
   private static final String INTERNAL_SHARED_STORAGE = "Internal shared storage";
-  /** Set by Settings to open the Hidden Files dialog once the main screen is back. */
-  public static volatile boolean pendingShowHiddenFiles = false;
-
   private static final String INTENT_ACTION_OPEN_QUICK_ACCESS =
       "com.amaze.filemanager.openQuickAccess";
   private static final String INTENT_ACTION_OPEN_RECENT = "com.amaze.filemanager.openRecent";
@@ -1431,20 +1428,6 @@ public class MainActivity extends PermissionsActivity
 
     drawer.refreshDrawer();
     drawer.refactorDrawerLockMode();
-
-    if (pendingShowHiddenFiles) {
-      pendingShowHiddenFiles = false;
-      getWindow()
-          .getDecorView()
-          .postDelayed(
-              () ->
-                  executeWithMainFragment(
-                      mainFragment -> {
-                        HiddenFilesDialog.showHiddenDialog(mainActivity, mainFragment);
-                        return null;
-                      }),
-              800);
-    }
 
     IntentFilter newFilter = new IntentFilter();
     newFilter.addAction(Intent.ACTION_MEDIA_MOUNTED);

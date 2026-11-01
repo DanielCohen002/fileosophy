@@ -23,12 +23,12 @@
         app:key="texteditor_newstack"
         app:summary="@string/preference_newstack_summary"
         app:title="@string/preference_newstack_title" />
-    <Preference
+    <com.amaze.filemanager.ui.views.preference.CheckBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:key="open_hidden_files"
-        app:summary="@string/hidden_files_manage_summary"
-        app:title="@string/hiddenfiles" />
+        app:defaultValue="false"
+        app:key="showHidden"
+        app:title="@string/hidden" />
     <Preference
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

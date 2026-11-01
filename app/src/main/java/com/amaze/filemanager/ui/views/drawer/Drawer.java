@@ -97,6 +97,7 @@ import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.legacy.app.ActionBarDrawerToggle;
 import androidx.lifecycle.ViewModelProvider;
@@ -178,6 +179,12 @@ public class Drawer implements NavigationView.OnNavigationItemSelectedListener {
     }*/
 
     navView.setNavigationItemSelectedListener(this);
+
+    // long-press a bookmark to drag it into a new position
+    if (navView.getChildCount() > 0 && navView.getChildAt(0) instanceof RecyclerView) {
+      new BookmarkDragHelper(mainActivity, mainActivity.getPrefs(), this::refreshDrawer)
+          .attach((RecyclerView) navView.getChildAt(0));
+    }
 
     int accentColor = mainActivity.getAccent(), idleColor;
 
