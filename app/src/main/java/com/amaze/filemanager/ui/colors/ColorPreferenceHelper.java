@@ -36,10 +36,10 @@ import androidx.annotation.ColorRes;
 
 public class ColorPreferenceHelper {
 
-  public static final @ColorRes int DEFAULT_PRIMARY_FIRST_TAB = R.color.primary_indigo,
-      DEFAULT_PRIMARY_SECOND_TAB = R.color.primary_indigo,
-      DEFAULT_ACCENT = R.color.primary_pink,
-      DEFAULT_ICON_SKIN = R.color.primary_pink;
+  public static final @ColorRes int DEFAULT_PRIMARY_FIRST_TAB = R.color.leather_primary,
+      DEFAULT_PRIMARY_SECOND_TAB = R.color.leather_primary,
+      DEFAULT_ACCENT = R.color.leather_accent,
+      DEFAULT_ICON_SKIN = R.color.leather_icon_skin;
 
   /** Combinations used when randomizing color selection at startup. */
   private static final @ColorRes int[][] RANDOM_COMBINATIONS =

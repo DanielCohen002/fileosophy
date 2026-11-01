@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="fileosophy_icon_background">#6B4226</color>
+    <color name="leather_primary">#6B4226</color>
+    <color name="leather_accent">#B8732E</color>
+    <color name="leather_icon_skin">#8A5A2B</color>
+    <color name="leather_cream">#F1E6D3</color>
+    <color name="leather_espresso">#2B1D14</color>
+</resources>

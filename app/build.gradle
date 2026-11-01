@@ -27,7 +27,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "app.pared.files"
+        applicationId "app.fileosophy.files"
         minSdkVersion libs.versions.minSdk.get().toInteger()
         targetSdkVersion libs.versions.targetSdk.get().toInteger()
         versionCode 125

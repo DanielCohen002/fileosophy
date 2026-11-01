@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-    <background android:drawable="@color/pared_icon_background" />
-    <foreground android:drawable="@drawable/ic_pared_foreground" />
-    <monochrome android:drawable="@drawable/ic_pared_monochrome" />
+    <background android:drawable="@color/fileosophy_icon_background" />
+    <foreground android:drawable="@drawable/ic_fileosophy_foreground" />
+    <monochrome android:drawable="@drawable/ic_fileosophy_monochrome" />
 </adaptive-icon>

@@ -122,6 +122,6 @@ object PreferencesConstants {
     const val KEY_TRASH_BIN_RETENTION_NUM_OF_FILES = "trash_bin_retention_num_of_files"
     const val KEY_TRASH_BIN_CLEANUP_INTERVAL_HOURS = "trash_bin_cleanup_interval_hours"
 
-    const val DEFAULT_PREFERENCE_DELETE_CONFIRMATION = true
+    const val DEFAULT_PREFERENCE_DELETE_CONFIRMATION = false
     const val DEFAULT_PREFERENCE_DELETE_PERMANENTLY_WITHOUT_CONFIRMATION = false
 }

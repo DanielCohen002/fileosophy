@@ -132,11 +132,11 @@ public class ThemedActivity extends PreferenceActivity {
 
     // setting window background color instead of each item, in order to reduce pixel overdraw
     if (getAppTheme().equals(AppTheme.LIGHT)) {
-      getWindow().setBackgroundDrawableResource(android.R.color.white);
+      getWindow().setBackgroundDrawableResource(R.drawable.leather_bg_light);
     } else if (getAppTheme().equals(AppTheme.BLACK)) {
       getWindow().setBackgroundDrawableResource(android.R.color.black);
     } else {
-      getWindow().setBackgroundDrawableResource(R.color.holo_dark_background);
+      getWindow().setBackgroundDrawableResource(R.drawable.leather_bg_dark);
     }
 
     // checking if theme should be set light/dark or automatic
@@ -166,7 +166,15 @@ public class ThemedActivity extends PreferenceActivity {
   public void initStatusBarResources(View parentView) {
 
     if (getToolbar() != null) {
-      getToolbar().setBackgroundColor(getPrimary());
+      // leather: solid primary color with a subtle tiled grain on top
+      android.graphics.drawable.Drawable grain =
+          ContextCompat.getDrawable(this, R.drawable.leather_grain);
+      getToolbar()
+          .setBackground(
+              new android.graphics.drawable.LayerDrawable(
+                  new android.graphics.drawable.Drawable[] {
+                    new android.graphics.drawable.ColorDrawable(getPrimary()), grain
+                  }));
     }
 
     Window window = getWindow();

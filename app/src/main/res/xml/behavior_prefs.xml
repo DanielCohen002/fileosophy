@@ -67,7 +67,7 @@
             app:summary="@string/trash_bin_cleanup_interval_summary"
             app:title="@string/trash_bin_cleanup_interval_title"></Preference>
         <com.amaze.filemanager.ui.views.preference.CheckBox
-            app:defaultValue="true"
+            app:defaultValue="false"
             app:key="delete_confirmation"
             app:summary="@string/preference_delete_confirmation_summary"
             app:title="@string/preference_delete_confirmation" />
