@@ -43,6 +43,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.CountDownTimer;
+import android.os.Environment;
 import android.os.Handler;
 import android.view.GestureDetector;
 import android.view.Gravity;
@@ -260,7 +261,16 @@ public class BottomBar implements View.OnTouchListener {
       view.setLayoutParams(params1);
       buttons.addView(view);
 
-      for (int i = 0; i < names.length; i++) {
+      // start the bar at the storage ("Home") instead of listing /storage/emulated
+      int firstShown = 0;
+      for (int i = 1; i < paths.length; i++) {
+        if (FileUtils.isStorage(paths[i])) {
+          firstShown = i;
+          break;
+        }
+      }
+
+      for (int i = firstShown; i < names.length; i++) {
         final int k = i;
         if (i == 0) {
           buttonRoot.setOnClickListener(
@@ -307,6 +317,14 @@ public class BottomBar implements View.OnTouchListener {
         timer.start();
       }
     }
+  }
+
+  private String replaceInternalStorageWithHome(String path) {
+    final String internal = Environment.getExternalStorageDirectory().getAbsolutePath();
+    if (path.equals(internal) || path.startsWith(internal + "/")) {
+      return mainActivity.getString(R.string.home) + path.substring(internal.length());
+    }
+    return path;
   }
 
   public FrameLayout getPathLayout() {
@@ -390,7 +408,7 @@ public class BottomBar implements View.OnTouchListener {
         newPath = mainActivityHelper.parseCloudPath(openmode, news);
         break;
       default:
-        newPath = news;
+        newPath = replaceInternalStorageWithHome(news);
     }
 
     pathText.setText(mainActivity.getString(R.string.folderfilecount, folderCount, fileCount));

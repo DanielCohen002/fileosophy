@@ -1199,6 +1199,7 @@ public class MainActivity extends PermissionsActivity
       menu.findItem(R.id.home).setVisible(false);
       menu.findItem(R.id.history).setVisible(false);
       menu.findItem(R.id.sethome).setVisible(true);
+      menu.findItem(R.id.clear_trash).setVisible(isInTrashBin());
       menu.findItem(R.id.sort).setVisible(true);
       menu.findItem(R.id.hiddenitems).setVisible(false);
       menu.findItem(R.id.add).setVisible(true);
@@ -1211,6 +1212,7 @@ public class MainActivity extends PermissionsActivity
         || fragment instanceof FtpServerFragment) {
       appBarLayout.setExpanded(true);
       menu.findItem(R.id.sethome).setVisible(false);
+      menu.findItem(R.id.clear_trash).setVisible(false);
       if (indicator_layout != null) indicator_layout.setVisibility(View.GONE);
       findViewById(R.id.buttonbarframe).setVisibility(View.GONE);
       menu.findItem(R.id.search).setVisible(false);
@@ -1232,6 +1234,7 @@ public class MainActivity extends PermissionsActivity
     } else if (fragment instanceof CompressedExplorerFragment) {
       appbar.setTitle(R.string.appbar_name);
       menu.findItem(R.id.sethome).setVisible(false);
+      menu.findItem(R.id.clear_trash).setVisible(false);
       if (indicator_layout != null) indicator_layout.setVisibility(View.GONE);
       getAppbar().getBottomBar().resetClickListener();
       menu.findItem(R.id.search).setVisible(false);
@@ -1245,6 +1248,13 @@ public class MainActivity extends PermissionsActivity
       invalidatePasteSnackbar(false);
     }
     return super.onPrepareOptionsMenu(menu);
+  }
+
+  private boolean isInTrashBin() {
+    final MainFragment mainFragment = getCurrentMainFragment();
+    return mainFragment != null
+        && mainFragment.getMainFragmentViewModel() != null
+        && mainFragment.getMainFragmentViewModel().getOpenMode() == OpenMode.TRASH_BIN;
   }
 
   // called when the user exits the action mode
@@ -1297,6 +1307,27 @@ public class MainActivity extends PermissionsActivity
                           .setHome(mainFragment.getCurrentPath());
                       updatePaths(mainFragment.getMainFragmentViewModel().getNo());
                       dialog.dismiss();
+                    });
+            dialog.show();
+          } else if (item.getItemId() == R.id.clear_trash) {
+            final MaterialDialog dialog =
+                GeneralDialogCreation.showBasicDialog(
+                    mainActivity,
+                    R.string.question_clear_trash,
+                    R.string.clear_trash,
+                    R.string.yes,
+                    R.string.no);
+            dialog
+                .getActionButton(DialogAction.POSITIVE)
+                .setOnClickListener(
+                    (v) -> {
+                      dialog.dismiss();
+                      new Thread(
+                              () -> {
+                                HybridFile.emptyTrashBin(mainActivity);
+                                runOnUiThread(() -> mainFragment.updateList(true));
+                              })
+                          .start();
                     });
             dialog.show();
           } else if (item.getItemId() == R.id.exit) {

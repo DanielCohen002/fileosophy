@@ -1611,6 +1611,22 @@ public class HybridFile {
     return true;
   }
 
+  /** Permanently deletes every file currently in the trash bin. */
+  public static void emptyTrashBin(Context context) {
+    TrashBin trashBin = AppConfig.getInstance().getTrashBinInstance();
+    if (trashBin == null) return;
+    List<TrashBinFile> filesInBin = trashBin.listFilesInBin();
+    if (filesInBin == null) return;
+    for (TrashBinFile trashBinFile : filesInBin) {
+      new HybridFile(
+              OpenMode.TRASH_BIN,
+              trashBinFile.getDeletedPath(trashBin.getConfig()),
+              trashBinFile.getFileName(),
+              trashBinFile.isDirectory())
+          .deletePermanentlyFromBin(context);
+    }
+  }
+
   public boolean deletePermanentlyFromBin(Context context) {
     List<TrashBinFile> trashBinFiles =
         Collections.singletonList(this.toTrashBinRestoreFile(context));

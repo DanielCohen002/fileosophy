@@ -788,6 +788,14 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     invalidateActionMode();
   }
 
+  private void applyLightSecondaryTextColor(@NonNull ItemViewHolder holder) {
+    if (!utilsProvider.getAppTheme().equals(AppTheme.LIGHT)) return;
+    final int color = Utils.getColor(context, R.color.leather_secondary_text);
+    holder.date.setTextColor(color);
+    holder.txtDesc.setTextColor(color);
+    holder.perm.setTextColor(color);
+  }
+
   private void bindViewHolderList(@NonNull final ItemViewHolder holder, int position) {
     final boolean isBackButton = getItemsDigested().get(position).specialType == TYPE_BACK;
     @Nullable
@@ -867,6 +875,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     if (utilsProvider.getAppTheme().equals(AppTheme.LIGHT)) {
       holder.about.setColorFilter(grey_color);
     }
+    applyLightSecondaryTextColor(holder);
     holder.about.setOnClickListener(v -> showPopup(v, rowItem));
     holder.genericIcon.setOnClickListener(
         v -> {
@@ -1154,6 +1163,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     if (utilsProvider.getAppTheme().equals(AppTheme.LIGHT)) {
       holder.about.setColorFilter(grey_color);
     }
+    applyLightSecondaryTextColor(holder);
     holder.about.setOnClickListener(v -> showPopup(v, rowItem));
 
     if (getBoolean(PREFERENCE_SHOW_LAST_MODIFIED)) {
