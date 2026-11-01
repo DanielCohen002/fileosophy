@@ -4,13 +4,26 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- folder with its bottom-right corner trimmed off -->
+    <!-- owl body with ear tufts -->
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M28,34 H44 L49,40 H80 V63 L70,73 H28 Z" />
-    <!-- the folded-over corner -->
+        android:fillColor="#C69C6D"
+        android:pathData="M34,40 L37,26 L46,34 Q54,31 62,34 L71,26 L74,40 V62 Q74,78 54,78 Q34,78 34,62 Z" />
+    <!-- eyes -->
     <path
-        android:fillColor="#FFFFFF"
-        android:fillAlpha="0.55"
-        android:pathData="M80,63 H70 V73 Z" />
+        android:fillColor="#F4EBDD"
+        android:pathData="M38,47 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 Z M54,47 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 Z" />
+    <path
+        android:fillColor="#2A1B12"
+        android:pathData="M43,47 a3.2,3.2 0 1,0 6.4,0 a3.2,3.2 0 1,0 -6.4,0 Z M58.6,47 a3.2,3.2 0 1,0 6.4,0 a3.2,3.2 0 1,0 -6.4,0 Z" />
+    <!-- beak -->
+    <path
+        android:fillColor="#6B4226"
+        android:pathData="M54,51 L50.5,58 L57.5,58 Z" />
+    <!-- folder held in front -->
+    <path
+        android:fillColor="#F4EBDD"
+        android:pathData="M30,66 H45 L49,70 H78 V84 H30 Z" />
+    <path
+        android:fillColor="#A97C50"
+        android:pathData="M30,73 H78 V74.5 H30 Z" />
 </vector>

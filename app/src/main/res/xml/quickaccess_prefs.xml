@@ -21,23 +21,23 @@
             app:key="recent"
             app:title="@string/recent" />
         <SwitchPreference
-            app:defaultValue="true"
+            app:defaultValue="false"
             app:key="image"
             app:title="@string/images" />
         <SwitchPreference
-            app:defaultValue="true"
+            app:defaultValue="false"
             app:key="video"
             app:title="@string/videos" />
         <SwitchPreference
-            app:defaultValue="true"
+            app:defaultValue="false"
             app:key="audio"
             app:title="@string/audio" />
         <SwitchPreference
-            app:defaultValue="true"
+            app:defaultValue="false"
             app:key="documents"
             app:title="@string/documents" />
         <SwitchPreference
-            app:defaultValue="true"
+            app:defaultValue="false"
             app:key="apks"
             app:title="@string/apks" />
     </PreferenceCategory>

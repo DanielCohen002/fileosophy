@@ -115,7 +115,7 @@ class UiPrefsFragment : BasePrefsFragment() {
                 val currentDragPreference: Int =
                     activity.prefs.getInt(
                         PreferencesConstants.PREFERENCE_DRAG_AND_DROP_PREFERENCE,
-                        PreferencesConstants.PREFERENCE_DRAG_DEFAULT,
+                        PreferencesConstants.PREFERENCE_DRAG_TO_SELECT,
                     )
                 dragDialogBuilder
                     .items(R.array.dragAndDropPreference)
@@ -143,7 +143,7 @@ class UiPrefsFragment : BasePrefsFragment() {
         val value =
             activity.prefs.getInt(
                 PreferencesConstants.PREFERENCE_DRAG_AND_DROP_PREFERENCE,
-                PreferencesConstants.PREFERENCE_DRAG_DEFAULT,
+                PreferencesConstants.PREFERENCE_DRAG_TO_SELECT,
             )
         val dragToMoveArray = resources.getStringArray(R.array.dragAndDropPreference)
         dragAndDropPref?.summary = dragToMoveArray[value]
