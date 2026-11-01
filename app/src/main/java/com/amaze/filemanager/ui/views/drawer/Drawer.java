@@ -57,6 +57,7 @@ import com.amaze.filemanager.ui.fragments.preferencefragments.QuickAccessesPrefs
 import com.amaze.filemanager.ui.theme.AppTheme;
 import com.amaze.filemanager.utils.Billing;
 import com.amaze.filemanager.utils.BookSorter;
+import com.amaze.filemanager.utils.BookmarkOrder;
 import com.amaze.filemanager.utils.DataUtils;
 import com.amaze.filemanager.utils.OTGUtil;
 import com.amaze.filemanager.utils.ScreenUtils;
@@ -411,7 +412,7 @@ public class Drawer implements NavigationView.OnNavigationItemSelectedListener {
     if (mainActivity.getBoolean(PREFERENCE_SHOW_SIDEBAR_FOLDERS)) {
       if (dataUtils.getBooks().size() > 0) {
 
-        Collections.sort(dataUtils.getBooks(), new BookSorter());
+        BookmarkOrder.sort(mainActivity.getPrefs(), dataUtils.getBooks());
 
         synchronized (dataUtils.getBooks()) {
           for (String[] file : dataUtils.getBooks()) {

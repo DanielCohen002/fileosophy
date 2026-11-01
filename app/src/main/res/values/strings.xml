@@ -605,6 +605,8 @@
 
     <string name="hidden_files_manage_summary" translatable="false">Files you chose to hide from the file list</string>
     <string name="shortcut_downloads" translatable="false">Downloads</string>
+    <string name="reorder_bookmarks" translatable="false">Reorder bookmarks</string>
+    <string name="reorder_bookmarks_hint" translatable="false">Press and hold a bookmark, then drag it up or down.</string>
     <string name="menu_add" translatable="false">Add</string>
     <string name="appbar_name" translatable="false">Fileosophy</string>
     <string name="processing">Processing&#8230;</string>

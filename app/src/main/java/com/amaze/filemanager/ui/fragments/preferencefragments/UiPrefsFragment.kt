@@ -26,6 +26,7 @@ import androidx.core.os.LocaleListCompat
 import androidx.preference.Preference
 import com.afollestad.materialdialogs.MaterialDialog
 import com.amaze.filemanager.R
+import com.amaze.filemanager.ui.dialogs.ReorderBookmarksDialog
 import com.amaze.filemanager.utils.getLangPreferenceDropdownEntries
 
 class UiPrefsFragment : BasePrefsFragment() {
@@ -101,6 +102,12 @@ class UiPrefsFragment : BasePrefsFragment() {
                     true
                 }
         }
+
+        findPreference<Preference>("reorder_bookmarks")?.onPreferenceClickListener =
+            Preference.OnPreferenceClickListener {
+                ReorderBookmarksDialog.show(requireActivity())
+                true
+            }
 
         val dragToMoveArray = resources.getStringArray(R.array.dragAndDropPreference)
         dragAndDropPref = findPreference(PreferencesConstants.PREFERENCE_DRAG_AND_DROP_PREFERENCE)

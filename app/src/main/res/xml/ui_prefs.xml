@@ -37,6 +37,9 @@
             app:key="sidebar_bookmarks"
             app:title="@string/show_bookmarks_pref" />
         <Preference
+            app:key="reorder_bookmarks"
+            app:title="@string/reorder_bookmarks" />
+        <Preference
             app:key="sidebar_quick_access"
             app:title="@string/show_quick_access_pref" />
     </PreferenceCategory>

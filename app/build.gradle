@@ -30,8 +30,8 @@ android {
         applicationId "app.fileosophy.files"
         minSdkVersion libs.versions.minSdk.get().toInteger()
         targetSdkVersion libs.versions.targetSdk.get().toInteger()
-        versionCode 127
-        versionName "1.1.1"
+        versionCode 128
+        versionName "1.2.0"
         multiDexEnabled true
 
         vectorDrawables.useSupportLibrary = true
