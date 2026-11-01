@@ -33,8 +33,13 @@ import androidx.preference.Preference.OnPreferenceClickListener
 import androidx.preference.PreferenceManager
 import com.amaze.filemanager.R
 import com.amaze.filemanager.TagsHelper
+import com.amaze.filemanager.application.AppConfig
+import com.amaze.filemanager.database.UtilsHandler
+import com.amaze.filemanager.database.models.OperationData
 import com.amaze.filemanager.ui.activities.MainActivity
+import com.amaze.filemanager.utils.DataUtils
 import com.google.gson.Gson
+import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import org.slf4j.Logger
@@ -42,6 +47,9 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class BackupPrefsFragment : BasePrefsFragment() {
     private val TAG: String = TagsHelper.getTag(BasePrefsFragment::class.java)
@@ -49,20 +57,30 @@ class BackupPrefsFragment : BasePrefsFragment() {
 
     companion object {
         val IMPORT_BACKUP_FILE: Int = 2
+        private const val BOOKMARKS_KEY = "fileosophy_bookmarks"
     }
 
     override val title = R.string.backup
 
+    /**
+     * A fresh name per export: saving over an existing file written by an earlier install is refused
+     * by Android, which used to make re-exporting fail.
+     */
+    private fun backupFileName(): String =
+        "fileosophy_backup_" + SimpleDateFormat("yyyy-MM-dd_HHmmss", Locale.US).format(Date()) + ".json"
+
     /** Export app settings to a JSON file */
     fun exportPrefs() {
-        val map: Map<String?, *> =
+        val map: MutableMap<String?, Any?> =
             PreferenceManager
-                .getDefaultSharedPreferences(requireActivity()).all
+                .getDefaultSharedPreferences(requireActivity()).all.toMutableMap()
+        // Bookmarks live in a database, not in the preferences, so they are added alongside
+        map[BOOKMARKS_KEY] = AppConfig.getInstance().utilsHandler.bookmarksList.map { it.toList() }
 
         val gsonString: String = Gson().toJson(map)
 
         try {
-            val file = File(context?.cacheDir?.absolutePath + File.separator + "fileosophy_backup.json")
+            val file = File(context?.cacheDir?.absolutePath + File.separator + backupFileName())
 
             val fileWriter = FileWriter(file)
 
@@ -143,8 +161,12 @@ class BackupPrefsFragment : BasePrefsFragment() {
                 val prefs = PreferenceManager.getDefaultSharedPreferences(requireActivity())
                 val editor: SharedPreferences.Editor = prefs.edit()
 
+                val bookmarks = json.remove(BOOKMARKS_KEY)
+
                 for ((key, value) in json.entrySet())
                     if (key.isNotEmpty()) storePreference(editor, key, value, prefs.all[key])
+
+                if (bookmarks != null && bookmarks.isJsonArray) restoreBookmarks(bookmarks.asJsonArray)
 
                 editor.apply()
 
@@ -171,6 +193,18 @@ class BackupPrefsFragment : BasePrefsFragment() {
         } else if (resultCode != Activity.RESULT_CANCELED) {
             Toast.makeText(context, getString(R.string.unknown_error), Toast.LENGTH_SHORT).show()
         }
+    }
+
+    /** Adds the backed-up bookmarks; ones that already exist are left alone. */
+    private fun restoreBookmarks(bookmarks: JsonArray) {
+        val handler = AppConfig.getInstance().utilsHandler
+        for (entry in bookmarks) {
+            val pair = entry.asJsonArray
+            handler.saveToDatabase(
+                OperationData(UtilsHandler.Operation.BOOKMARKS, pair[0].asString, pair[1].asString),
+            ).blockingAwait()
+        }
+        DataUtils.getInstance().setBooks(handler.bookmarksList)
     }
 
     /**
