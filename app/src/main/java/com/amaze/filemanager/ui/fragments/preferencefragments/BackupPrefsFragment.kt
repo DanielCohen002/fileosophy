@@ -35,14 +35,13 @@ import com.amaze.filemanager.R
 import com.amaze.filemanager.TagsHelper
 import com.amaze.filemanager.ui.activities.MainActivity
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import com.google.gson.JsonElement
+import com.google.gson.JsonParser
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.io.BufferedReader
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
-import java.io.InputStreamReader
 
 class BackupPrefsFragment : BasePrefsFragment() {
     private val TAG: String = TagsHelper.getTag(BasePrefsFragment::class.java)
@@ -100,11 +99,7 @@ class BackupPrefsFragment : BasePrefsFragment() {
             startActivityForResult(
                 Intent(Intent.ACTION_OPEN_DOCUMENT)
                     .addCategory(Intent.CATEGORY_OPENABLE)
-                    .setType("*/*")
-                    .putExtra(
-                        Intent.EXTRA_MIME_TYPES,
-                        arrayOf("application/json"),
-                    ),
+                    .setType("*/*"),
                 IMPORT_BACKUP_FILE,
             )
         } else {
@@ -142,28 +137,16 @@ class BackupPrefsFragment : BasePrefsFragment() {
                         context?.contentResolver?.openInputStream(it)
                     }
 
-                val bufferedReader = BufferedReader(InputStreamReader(inputStream))
-                val stringBuilder = StringBuilder()
+                val text = inputStream?.bufferedReader()?.use { it.readText() } ?: throw IOException("empty")
+                val json = JsonParser.parseString(text).asJsonObject
 
-                var line: String?
-                while (bufferedReader.readLine().also { line = it } != null)
-                    stringBuilder.append(line).append('\n')
+                val prefs = PreferenceManager.getDefaultSharedPreferences(requireActivity())
+                val editor: SharedPreferences.Editor = prefs.edit()
 
-                val type = object : TypeToken<Map<String?, Any>>() {}.type
+                for ((key, value) in json.entrySet())
+                    if (key.isNotEmpty()) storePreference(editor, key, value, prefs.all[key])
 
-                val map: Map<String?, Any> =
-                    Gson().fromJson(
-                        stringBuilder.toString(),
-                        type,
-                    )
-
-                val editor: SharedPreferences.Editor? =
-                    PreferenceManager.getDefaultSharedPreferences(requireActivity()).edit()
-
-                for ((key, value) in map)
-                    storePreference(editor, key, value)
-
-                editor?.apply()
+                editor.apply()
 
                 Toast.makeText(
                     context,
@@ -177,7 +160,7 @@ class BackupPrefsFragment : BasePrefsFragment() {
                         MainActivity::class.java,
                     ),
                 ) // restart Amaze for changes to take effect
-            } catch (e: IOException) {
+            } catch (e: Exception) {
                 Toast.makeText(
                     context,
                     getString(R.string.importing_failed),
@@ -185,33 +168,55 @@ class BackupPrefsFragment : BasePrefsFragment() {
                 ).show()
                 log.error(getString(R.string.importing_failed), e)
             }
-        } else {
+        } else if (resultCode != Activity.RESULT_CANCELED) {
             Toast.makeText(context, getString(R.string.unknown_error), Toast.LENGTH_SHORT).show()
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
+    /**
+     * Stores one backed-up value. JSON does not keep number types, so an existing preference with
+     * the same key decides between Int, Long and Float.
+     */
     private fun storePreference(
-        editor: SharedPreferences.Editor?,
-        key: String?,
-        value: Any,
+        editor: SharedPreferences.Editor,
+        key: String,
+        value: JsonElement,
+        current: Any?,
     ) {
         try {
-            when (value::class.simpleName) {
-                "Boolean" -> editor?.putBoolean(key, value as Boolean)
-                "Float" -> editor?.putFloat(key, value as Float)
-                "Int" -> editor?.putInt(key, value as Int)
-                "Long" -> editor?.putLong(key, value as Long)
-                "String" -> editor?.putString(key, value.toString())
-                "Set<*>" -> editor?.putStringSet(key, value as Set<String>)
+            when {
+                value.isJsonArray ->
+                    editor.putStringSet(key, value.asJsonArray.map { it.asString }.toSet())
+                value.isJsonPrimitive && value.asJsonPrimitive.isBoolean ->
+                    editor.putBoolean(key, value.asBoolean)
+                value.isJsonPrimitive && value.asJsonPrimitive.isString ->
+                    editor.putString(key, value.asString)
+                value.isJsonPrimitive && value.asJsonPrimitive.isNumber -> storeNumber(editor, key, value, current)
             }
-        } catch (e: java.lang.ClassCastException) {
+        } catch (e: Exception) {
             Toast.makeText(
                 context,
                 "${getString(R.string.import_failed_for)} $key",
                 Toast.LENGTH_SHORT,
             ).show()
             log.error("${getString(R.string.import_failed_for)} $key", e)
+        }
+    }
+
+    private fun storeNumber(
+        editor: SharedPreferences.Editor,
+        key: String,
+        value: JsonElement,
+        current: Any?,
+    ) {
+        val number = value.asBigDecimal
+        when {
+            current is Long -> editor.putLong(key, number.toLong())
+            current is Float -> editor.putFloat(key, number.toFloat())
+            current is Int -> editor.putInt(key, number.toInt())
+            number.scale() > 0 -> editor.putFloat(key, number.toFloat())
+            number.toLong() in Int.MIN_VALUE..Int.MAX_VALUE -> editor.putInt(key, number.toInt())
+            else -> editor.putLong(key, number.toLong())
         }
     }
 
