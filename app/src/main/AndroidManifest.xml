@@ -290,7 +290,7 @@
             android:name=".ui.activities.AudioPlayerActivity"
             android:exported="true"
             android:label="@string/amaze_audio_player"
-            android:theme="@style/appCompatBlack"
+            android:theme="@style/audioPlayerDialog"
             android:configChanges="orientation|screenSize|uiMode|keyboardHidden">
             <intent-filter tools:ignore="AppLinkUrlError">
                 <action android:name="android.intent.action.VIEW" />

@@ -134,14 +134,14 @@ class AudioPlayerActivity : AppCompatActivity() {
         val root = LinearLayout(this)
         root.orientation = LinearLayout.VERTICAL
         root.gravity = Gravity.CENTER
-        root.setBackgroundColor(Color.BLACK)
-        root.fitsSystemWindows = true
         root.setPadding(48, 48, 48, 48)
         root.addView(title, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
         root.addView(seekBar, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
         root.addView(times, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
         root.addView(playPause, LinearLayout.LayoutParams(PLAY_BUTTON_SIZE, PLAY_BUTTON_SIZE).apply { topMargin = 48 })
         setContentView(root)
+        // Popup over the file list rather than a full-screen page
+        window.setLayout((resources.displayMetrics.widthPixels * POPUP_WIDTH_FRACTION).toInt(), ViewGroup.LayoutParams.WRAP_CONTENT)
         updatePlayPauseIcon()
 
         startPlayback(uri)
@@ -230,5 +230,6 @@ class AudioPlayerActivity : AppCompatActivity() {
         const val EXTRA_TITLE = "title"
         private const val PROGRESS_INTERVAL_MS = 250L
         private const val PLAY_BUTTON_SIZE = 220
+        private const val POPUP_WIDTH_FRACTION = 0.9f
     }
 }

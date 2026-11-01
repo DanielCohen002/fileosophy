@@ -61,6 +61,11 @@
     </style>
 
     <!-- black -->
+    <style name="audioPlayerDialog" parent="Theme.AppCompat.Dialog">
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
     <style name="appCompatBlack" parent="appCompatDark">
         <item name="android:windowBackground">@android:color/black</item>
         <item name="popup">@style/overflow_black</item>
