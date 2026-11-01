@@ -1153,11 +1153,12 @@ public class MainActivity extends PermissionsActivity
       search.setVisible(true);
       if (indicator_layout != null) indicator_layout.setVisibility(View.VISIBLE);
       menu.findItem(R.id.search).setVisible(true);
-      menu.findItem(R.id.home).setVisible(true);
+      menu.findItem(R.id.home).setVisible(false);
       menu.findItem(R.id.history).setVisible(true);
       menu.findItem(R.id.sethome).setVisible(true);
       menu.findItem(R.id.sort).setVisible(true);
       menu.findItem(R.id.hiddenitems).setVisible(true);
+      menu.findItem(R.id.add).setVisible(true);
       menu.findItem(R.id.view).setVisible(true);
       menu.findItem(R.id.extract).setVisible(false);
       invalidatePasteSnackbar(true);
@@ -1182,6 +1183,7 @@ public class MainActivity extends PermissionsActivity
         menu.findItem(R.id.sortby).setVisible(false);
       }
       menu.findItem(R.id.hiddenitems).setVisible(false);
+      menu.findItem(R.id.add).setVisible(false);
       menu.findItem(R.id.view).setVisible(false);
       invalidatePasteSnackbar(false);
     } else if (fragment instanceof CompressedExplorerFragment) {
@@ -1194,6 +1196,7 @@ public class MainActivity extends PermissionsActivity
       menu.findItem(R.id.history).setVisible(false);
       menu.findItem(R.id.sort).setVisible(false);
       menu.findItem(R.id.hiddenitems).setVisible(false);
+      menu.findItem(R.id.add).setVisible(false);
       menu.findItem(R.id.view).setVisible(false);
       menu.findItem(R.id.extract).setVisible(true);
       invalidatePasteSnackbar(false);
@@ -1216,6 +1219,16 @@ public class MainActivity extends PermissionsActivity
         mainFragment -> {
           if (item.getItemId() == R.id.home) {
             mainFragment.home();
+          } else if (item.getItemId() == R.id.add_folder) {
+            mainActivityHelper.mkdir(
+                mainFragment.getMainFragmentViewModel().getOpenMode(),
+                mainFragment.getCurrentPath(),
+                mainFragment);
+          } else if (item.getItemId() == R.id.add_file) {
+            mainActivityHelper.mkfile(
+                mainFragment.getMainFragmentViewModel().getOpenMode(),
+                mainFragment.getCurrentPath(),
+                mainFragment);
           } else if (item.getItemId() == R.id.history) {
             HistoryDialog.showHistoryDialog(mainActivity, mainFragment);
           } else if (item.getItemId() == R.id.sethome) {
@@ -1823,85 +1836,20 @@ public class MainActivity extends PermissionsActivity
   }
 
   public void initializeFabActionViews() {
-    // NOTE: SpeedDial inverts insert index than FABsmenu
-    FabWithLabelView cloudFab =
-        initFabTitle(
-            R.id.menu_new_cloud, R.string.cloud_connection, R.drawable.ic_cloud_white_24dp);
-    FabWithLabelView newFileFab =
-        initFabTitle(R.id.menu_new_file, R.string.file, R.drawable.ic_insert_drive_file_white_48dp);
-    FabWithLabelView newFolderFab =
-        initFabTitle(R.id.menu_new_folder, R.string.folder, R.drawable.folder_fab);
-
-    floatingActionButton.setOnActionSelectedListener(
-        actionItem -> {
-          MainFragment mainFragment = getCurrentMainFragment();
-
-          if (mainFragment == null) return false;
-
-          String path = mainFragment.getCurrentPath();
-
-          MainFragmentViewModel mainFragmentViewModel = mainFragment.getMainFragmentViewModel();
-
-          if (mainFragmentViewModel == null) return false;
-
-          OpenMode openMode = mainFragmentViewModel.getOpenMode();
-
-          int id = actionItem.getId();
-
-          if (id == R.id.menu_new_folder)
-            mainActivity.mainActivityHelper.mkdir(openMode, path, mainFragment);
-          else if (id == R.id.menu_new_file)
-            mainActivity.mainActivityHelper.mkfile(openMode, path, mainFragment);
-          else if (id == R.id.menu_new_cloud)
-            new CloudSheetFragment()
-                .show(mainActivity.getSupportFragmentManager(), CloudSheetFragment.TAG_FRAGMENT);
-
-          floatingActionButton.close(true);
-          return true;
-        });
-
-    floatingActionButton.setOnClickListener(
-        view -> {
-          fabButtonClick(cloudFab);
-        });
-    floatingActionButton.setOnFocusChangeListener(new CustomZoomFocusChange());
-    floatingActionButton.getMainFab().setOnFocusChangeListener(new CustomZoomFocusChange());
-    floatingActionButton.setNextFocusUpId(cloudFab.getId());
-    floatingActionButton.getMainFab().setNextFocusUpId(cloudFab.getId());
-    floatingActionButton.setOnKeyListener(
-        (v, keyCode, event) -> {
-          if (event.getAction() == KeyEvent.ACTION_DOWN) {
-            if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_RIGHT) {
-              if (getCurrentTab() == 0 && getFAB().isFocused()) {
-                getTabFragment().setCurrentItem(1);
-              }
-            } else if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_LEFT) {
-              findViewById(R.id.content_frame).requestFocus();
-            } else if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_DOWN) {
-              if (pasteHelper != null
-                  && pasteHelper.getSnackbar() != null
-                  && pasteHelper.getSnackbar().isShown())
-                ((Snackbar.SnackbarLayout) pasteHelper.getSnackbar().getView())
-                    .findViewById(R.id.snackBarActionButton)
-                    .requestFocus();
-            } else if (event.getKeyCode() == KeyEvent.KEYCODE_DPAD_CENTER) {
-              fabButtonClick(cloudFab);
-            } else if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
-              onBackPressed();
-            } else {
-              return false;
-            }
+    // The bottom-right button is a single "home" button: it jumps back to the root/home path.
+    clearFabActionItems();
+    floatingActionButton.setOnChangeListener(
+        new SpeedDialView.OnChangeListener() {
+          @Override
+          public boolean onMainActionSelected() {
+            MainFragment mainFragment = getCurrentMainFragment();
+            if (mainFragment != null) mainFragment.home();
+            return true;
           }
-          return true;
+
+          @Override
+          public void onToggleChanged(boolean isOpen) {}
         });
-    cloudFab.setNextFocusDownId(floatingActionButton.getMainFab().getId());
-    cloudFab.setNextFocusUpId(newFileFab.getId());
-    cloudFab.setOnFocusChangeListener(new CustomZoomFocusChange());
-    newFileFab.setNextFocusDownId(cloudFab.getId());
-    newFileFab.setNextFocusUpId(newFolderFab.getId());
-    newFileFab.setOnFocusChangeListener(new CustomZoomFocusChange());
-    newFolderFab.setNextFocusDownId(newFileFab.getId());
-    newFolderFab.setOnFocusChangeListener(new CustomZoomFocusChange());
   }
 
   private void fabButtonClick(FabWithLabelView cloudFab) {

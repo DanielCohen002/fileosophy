@@ -26,7 +26,8 @@
         app:showAsAction="always" />
     <item android:id="@+id/home"
         android:title="@string/home"
-        app:showAsAction="ifRoom"
+        android:visible="false"
+        app:showAsAction="never"
         android:icon="@drawable/ic_home_white_24dp"/>
     <item
         app:showAsAction="ifRoom"
@@ -45,6 +46,19 @@
         android:icon="@drawable/ic_history_white_24dp"
         app:showAsAction="ifRoom"
         android:title="@string/history"/>
+    <item
+        android:id="@+id/add"
+        android:title="@string/menu_add"
+        app:showAsAction="never">
+        <menu>
+            <item
+                android:id="@+id/add_folder"
+                android:title="@string/folder" />
+            <item
+                android:id="@+id/add_file"
+                android:title="@string/file" />
+        </menu>
+    </item>
     <item
         android:id="@+id/view"
         android:title=""/>
