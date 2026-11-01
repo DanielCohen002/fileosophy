@@ -334,6 +334,9 @@ public class MainActivity extends PermissionsActivity
 
   private static final String DEFAULT_FALLBACK_STORAGE_PATH = "/storage/sdcard0";
   private static final String INTERNAL_SHARED_STORAGE = "Internal shared storage";
+  /** Set by Settings to open the Hidden Files dialog once the main screen is back. */
+  public static volatile boolean pendingShowHiddenFiles = false;
+
   private static final String INTENT_ACTION_OPEN_QUICK_ACCESS =
       "com.amaze.filemanager.openQuickAccess";
   private static final String INTENT_ACTION_OPEN_RECENT = "com.amaze.filemanager.openRecent";
@@ -1154,10 +1157,10 @@ public class MainActivity extends PermissionsActivity
       if (indicator_layout != null) indicator_layout.setVisibility(View.VISIBLE);
       menu.findItem(R.id.search).setVisible(true);
       menu.findItem(R.id.home).setVisible(false);
-      menu.findItem(R.id.history).setVisible(true);
+      menu.findItem(R.id.history).setVisible(false);
       menu.findItem(R.id.sethome).setVisible(true);
       menu.findItem(R.id.sort).setVisible(true);
-      menu.findItem(R.id.hiddenitems).setVisible(true);
+      menu.findItem(R.id.hiddenitems).setVisible(false);
       menu.findItem(R.id.add).setVisible(true);
       menu.findItem(R.id.view).setVisible(true);
       menu.findItem(R.id.extract).setVisible(false);
@@ -1419,6 +1422,20 @@ public class MainActivity extends PermissionsActivity
 
     drawer.refreshDrawer();
     drawer.refactorDrawerLockMode();
+
+    if (pendingShowHiddenFiles) {
+      pendingShowHiddenFiles = false;
+      getWindow()
+          .getDecorView()
+          .postDelayed(
+              () ->
+                  executeWithMainFragment(
+                      mainFragment -> {
+                        HiddenFilesDialog.showHiddenDialog(mainActivity, mainFragment);
+                        return null;
+                      }),
+              800);
+    }
 
     IntentFilter newFilter = new IntentFilter();
     newFilter.addAction(Intent.ACTION_MEDIA_MOUNTED);
@@ -1838,6 +1855,10 @@ public class MainActivity extends PermissionsActivity
   public void initializeFabActionViews() {
     // The bottom-right button is a single "home" button: it jumps back to the root/home path.
     clearFabActionItems();
+    floatingActionButton.setMainFabClosedDrawable(
+        ContextCompat.getDrawable(this, R.drawable.ic_home_white_24dp));
+    floatingActionButton.setMainFabOpenedDrawable(
+        ContextCompat.getDrawable(this, R.drawable.ic_home_white_24dp));
     floatingActionButton.setOnChangeListener(
         new SpeedDialView.OnChangeListener() {
           @Override

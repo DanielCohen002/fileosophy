@@ -1,3 +1,5 @@
+<p align="center"><img src="fileosophy-logo.svg" alt="Fileosophy logo" width="160"></p>
+
 # Fileosophy
 
 A personal, trimmed-down file manager for Android with a leather look. Fileosophy is a fork of
@@ -20,7 +22,7 @@ actually use.
 
 ## Download
 
-Grab the latest APK from the [Releases page](../../releases/latest) and install it on your phone
+Grab the latest APK from the [Releases page](https://github.com/DanielCohen002/fileosophy/releases) and install it on your phone
 (you may need to allow installs from your browser). Releases are marked pre-release while the app
 is still changing.
 

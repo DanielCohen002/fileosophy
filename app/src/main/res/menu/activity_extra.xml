@@ -33,7 +33,7 @@
         app:showAsAction="ifRoom"
         android:id="@+id/sort"
         android:title="@string/sort"
-        android:icon="@drawable/ic_sort_white_24dp">
+        android:icon="@drawable/ic_sort_arrows_white_24dp">
         <menu >
             <item android:title="@string/sort_by"
                 android:id="@+id/sortby"/>

@@ -27,7 +27,9 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.folderselector.FolderChooserDialog
+import android.content.Intent
 import com.amaze.filemanager.R
+import com.amaze.filemanager.ui.activities.MainActivity
 import com.amaze.filemanager.application.AppConfig
 import com.amaze.filemanager.ui.dialogs.OpenFileDialogFragment.Companion.clearPreferences
 import com.amaze.trashbin.TrashBinConfig
@@ -41,6 +43,16 @@ class BehaviorPrefsFragment : BasePrefsFragment(), FolderChooserDialog.FolderCal
         rootKey: String?,
     ) {
         setPreferencesFromResource(R.xml.behavior_prefs, rootKey)
+
+        findPreference<Preference>("open_hidden_files")?.onPreferenceClickListener =
+            Preference.OnPreferenceClickListener {
+                MainActivity.pendingShowHiddenFiles = true
+                val intent = Intent(activity, MainActivity::class.java)
+                intent.action = Intent.ACTION_MAIN
+                activity.finish()
+                activity.startActivity(intent)
+                true
+            }
 
         findPreference<Preference>("clear_open_file")?.onPreferenceClickListener =
             Preference.OnPreferenceClickListener {

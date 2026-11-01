@@ -26,6 +26,12 @@
     <Preference
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:key="open_hidden_files"
+        app:summary="@string/hidden_files_manage_summary"
+        app:title="@string/hiddenfiles" />
+    <Preference
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:key="clear_open_file"
         app:summary="@string/clear_open_file_summary"
         app:title="@string/clear_open_file" />
