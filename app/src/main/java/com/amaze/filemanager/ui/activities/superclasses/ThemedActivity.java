@@ -46,7 +46,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.view.View;
@@ -148,11 +147,11 @@ public class ThemedActivity extends PreferenceActivity {
     }
 
     if (SDK_INT >= LOLLIPOP) {
+      // The launcher icon is an adaptive icon (not a BitmapDrawable); the system falls back to the
+      // app icon when no bitmap is supplied.
       ActivityManager.TaskDescription taskDescription =
           new ActivityManager.TaskDescription(
-              getString(R.string.appbar_name),
-              ((BitmapDrawable) ContextCompat.getDrawable(this, R.mipmap.ic_launcher)).getBitmap(),
-              getPrimary());
+              getString(R.string.appbar_name), (android.graphics.Bitmap) null, getPrimary());
       setTaskDescription(taskDescription);
     }
 
