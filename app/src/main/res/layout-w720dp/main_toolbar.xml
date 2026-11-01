@@ -55,21 +55,16 @@
             android:layout_width="wrap_content"
             android:layout_marginBottom="16dp"
             android:id="@+id/indicator_layout"
-            android:layout_height="2dp">
+            android:layout_height="wrap_content">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/tab_indicator1"
+            <com.amaze.filemanager.ui.views.Indicator
+                android:id="@+id/indicator"
                 android:layout_width="wrap_content"
-                android:minWidth="50dp"
-                android:layout_marginRight="2dp"
-                android:layout_height="match_parent" />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/tab_indicator2"
-                android:layout_width="wrap_content"
-                android:minWidth="50dp"
-                android:layout_marginLeft="2dp"
-                android:layout_height="match_parent" />
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|center_horizontal"
+                android:layout_marginTop="@dimen/padding_normal"
+                app:currentPageIndicatorColor="?attr/colorAccent"
+                />
         </LinearLayout>
 
         <com.leinardi.android.speeddial.SpeedDialOverlayLayout

@@ -114,7 +114,6 @@ public class PermissionsActivity extends ThemedActivity
 
   @RequiresApi(TIRAMISU)
   public void requestNotificationPermission(boolean isInitialStart) {
-    Utils.disableScreenRotation(this);
     final MaterialDialog materialDialog =
         GeneralDialogCreation.showBasicDialog(
             this,
@@ -137,7 +136,6 @@ public class PermissionsActivity extends ThemedActivity
 
   public void requestStoragePermission(
       @NonNull final OnPermissionGranted onPermissionGranted, boolean isInitialStart) {
-    Utils.disableScreenRotation(this);
     final MaterialDialog materialDialog =
         GeneralDialogCreation.showBasicDialog(
             this,
@@ -282,7 +280,6 @@ public class PermissionsActivity extends ThemedActivity
   @RequiresApi(api = Build.VERSION_CODES.R)
   private void requestAllFilesAccessPermission(
       @NonNull final OnPermissionGranted onPermissionGranted) {
-    Utils.disableScreenRotation(this);
     permissionCallbacks[ALL_FILES_PERMISSION] = onPermissionGranted;
     try {
       Intent intent =

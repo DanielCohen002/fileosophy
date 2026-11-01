@@ -36,7 +36,6 @@ import com.amaze.filemanager.application.AppConfig;
 import com.amaze.filemanager.database.TabHandler;
 import com.amaze.filemanager.database.models.explorer.Tab;
 import com.amaze.filemanager.fileoperations.filesystem.OpenMode;
-import com.amaze.filemanager.ui.ColorCircleDrawable;
 import com.amaze.filemanager.ui.ExtensionsKt;
 import com.amaze.filemanager.ui.activities.MainActivity;
 import com.amaze.filemanager.ui.colors.UserColorPreferences;
@@ -98,7 +97,6 @@ public class TabFragment extends Fragment {
   private Indicator indicator;
 
   /** views for circlular drawables below android lollipop */
-  private AppCompatImageView circleDrawable1, circleDrawable2;
 
   /** color drawable for action bar background */
   private final ColorDrawable colorDrawable = new ColorDrawable();
@@ -119,14 +117,9 @@ public class TabFragment extends Fragment {
     fragmentManager = requireActivity().getSupportFragmentManager();
     dragPlaceholder = rootView.findViewById(R.id.drag_placeholder);
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      indicator = requireActivity().findViewById(R.id.indicator);
-      // same color as the home button
-      indicator.setSelectedColour(requireMainActivity().getAccent());
-    } else {
-      circleDrawable1 = requireActivity().findViewById(R.id.tab_indicator1);
-      circleDrawable2 = requireActivity().findViewById(R.id.tab_indicator2);
-    }
+    indicator = requireActivity().findViewById(R.id.indicator);
+    // same color as the home button
+    indicator.setSelectedColour(requireMainActivity().getAccent());
 
     sharedPrefs = PreferenceManager.getDefaultSharedPreferences(requireActivity());
     savePaths = sharedPrefs.getBoolean(PREFERENCE_SAVED_PATHS, DEFAULT_SAVED_PATHS);
@@ -153,9 +146,6 @@ public class TabFragment extends Fragment {
 
       try {
         viewPager.setCurrentItem(lastOpenTab, true);
-        if (circleDrawable1 != null && circleDrawable2 != null) {
-          updateIndicator(viewPager.getCurrentItem());
-        }
       } catch (Exception e) {
         LOG.warn("failed to set current viewpager item", e);
       }
@@ -337,8 +327,6 @@ public class TabFragment extends Fragment {
           requireMainActivity().showFab();
         }
       }
-
-      if (circleDrawable1 != null && circleDrawable2 != null) updateIndicator(p1);
     }
 
     @Override
@@ -504,18 +492,6 @@ public class TabFragment extends Fragment {
   public Fragment getFragmentAtIndex(int pos) {
     if (fragments.size() == TAB_COUNT && pos < TAB_COUNT) return fragments.get(pos);
     else return null;
-  }
-
-  // updating indicator color as per the current viewpager tab
-  void updateIndicator(int index) {
-    if (index != 0 && index != 1) return;
-
-    // same color as the home button; the tab that is not shown is a faded version of it
-    int selectedColor = requireMainActivity().getAccent();
-    int fadedColor = androidx.core.graphics.ColorUtils.setAlphaComponent(selectedColor, 90);
-
-    circleDrawable1.setImageDrawable(new ColorCircleDrawable(index == 0 ? selectedColor : fadedColor));
-    circleDrawable2.setImageDrawable(new ColorCircleDrawable(index == 1 ? selectedColor : fadedColor));
   }
 
   public ConstraintLayout getDragPlaceholder() {

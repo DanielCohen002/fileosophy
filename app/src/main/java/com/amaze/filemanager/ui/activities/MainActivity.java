@@ -676,18 +676,12 @@ public class MainActivity extends PermissionsActivity
               : getString(R.string.pick_a_file);
       Toast.makeText(this, text, Toast.LENGTH_LONG).show();
 
-      // disable screen rotation just for convenience purpose
-      // TODO: Support screen rotation when picking file
-      Utils.disableScreenRotation(this);
     } else if (actionIntent.equals(RingtoneManager.ACTION_RINGTONE_PICKER)) {
       // ringtone picker intent
       mReturnIntent = true;
       mRingtonePickerIntent = true;
       Toast.makeText(this, getString(R.string.pick_a_file), Toast.LENGTH_LONG).show();
 
-      // disable screen rotation just for convenience purpose
-      // TODO: Support screen rotation when picking file
-      Utils.disableScreenRotation(this);
     } else if (actionIntent.equals(Intent.ACTION_VIEW)) {
       // zip viewer intent
       Uri uri = intent.getData();
@@ -735,9 +729,6 @@ public class MainActivity extends PermissionsActivity
           Toast.makeText(this, R.string.error_unsupported_or_null_uri, Toast.LENGTH_LONG).show();
         }
       }
-      // disable screen rotation just for convenience purpose
-      // TODO: Support screen rotation when saving a file
-      Utils.disableScreenRotation(this);
 
     } else if (actionIntent.equals(Intent.ACTION_SEND_MULTIPLE) && type != null) {
       // save multiple files to filesystem
@@ -745,9 +736,6 @@ public class MainActivity extends PermissionsActivity
       ArrayList<Uri> arrayList = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
       showSaveSnackbar(arrayList);
 
-      // disable screen rotation just for convenience purpose
-      // TODO: Support screen rotation when saving a file
-      Utils.disableScreenRotation(this);
     }
   }
 
