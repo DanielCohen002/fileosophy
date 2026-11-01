@@ -508,10 +508,12 @@ public class TabFragment extends Fragment {
   void updateIndicator(int index) {
     if (index != 0 && index != 1) return;
 
-    int accentColor = requireMainActivity().getAccent();
+    // follows the theme's primary color; the tab that is not shown is a faded version of it
+    int selectedColor = requireMainActivity().getPrimary();
+    int fadedColor = androidx.core.graphics.ColorUtils.setAlphaComponent(selectedColor, 90);
 
-    circleDrawable1.setImageDrawable(new ColorCircleDrawable(accentColor));
-    circleDrawable2.setImageDrawable(new ColorCircleDrawable(Color.GRAY));
+    circleDrawable1.setImageDrawable(new ColorCircleDrawable(index == 0 ? selectedColor : fadedColor));
+    circleDrawable2.setImageDrawable(new ColorCircleDrawable(index == 1 ? selectedColor : fadedColor));
   }
 
   public ConstraintLayout getDragPlaceholder() {
