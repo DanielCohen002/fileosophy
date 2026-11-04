@@ -246,6 +246,9 @@
     <string name="textreader">Text Reader</string>
     <string name="databasereader">Database Reader</string>
     <string name="show_dividers">Show Dividers</string>
+    <string name="fab_button_title">Bottom-right button</string>
+    <string name="fab_button_home">Home</string>
+    <string name="fab_button_downloads">Downloads</string>
     <string name="needs_access">Write Access Required</string>
     <string name="needs_access_summary">Please choose the root directory of \t</string>
     <string name="needs_access_summary1">\tto grant write access to operate </string>
@@ -267,8 +270,8 @@
     <string name="total">Total:</string>
     <string name="calculating"> calculating </string>
     <string name="sort">Sort</string>
-    <string name="ascending">Ascending</string>
-    <string name="descending">Descending</string>
+    <string name="ascending">A → Z</string>
+    <string name="descending">Z → A</string>
     <string name="default_string">Default</string>
     <string name="doit">Do it</string>
     <string name="want_help"><u>Need help?</u></string>

@@ -24,6 +24,12 @@
         app:key="goBack_checkbox"
         app:summary="@string/back_summary"
         app:title="@string/back_title" />
+    <com.amaze.filemanager.ui.views.preference.CheckBox
+        app:defaultValue="false"
+        app:key="fabDownloads"
+        app:summaryOff="@string/fab_button_home"
+        app:summaryOn="@string/fab_button_downloads"
+        app:title="@string/fab_button_title" />
     <Preference
         app:key="dragAndDropPreference"
         app:title="@string/drag_and_drop_preference" />

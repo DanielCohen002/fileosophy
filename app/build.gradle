@@ -29,8 +29,8 @@ android {
         applicationId "app.fileosophy.files"
         minSdkVersion libs.versions.minSdk.get().toInteger()
         targetSdkVersion libs.versions.targetSdk.get().toInteger()
-        versionCode 149
-        versionName "1.7.5"
+        versionCode 150
+        versionName "1.7.6"
         multiDexEnabled true
 
         vectorDrawables.useSupportLibrary = true
@@ -47,7 +47,7 @@ android {
 
     applicationVariants.all { variant ->
         variant.outputs.all {
-            outputFileName = "fileosophy-${variant.versionName}-${variant.name}.apk"
+            outputFileName = "fileosophy-${variant.versionName}.apk"
         }
     }
 

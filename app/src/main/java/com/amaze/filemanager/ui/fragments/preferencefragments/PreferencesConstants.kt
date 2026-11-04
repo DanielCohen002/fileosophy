@@ -34,6 +34,7 @@ object PreferencesConstants {
     const val PREFERENCE_GRID_COLUMNS = "columnsGrid"
     const val PREFERENCE_GRID_COLUMNS_DEFAULT = "3"
     const val PREFERENCE_ENABLE_MARQUEE_FILENAME = "enableMarqueeFilename"
+    const val PREFERENCE_FAB_DOWNLOADS = "fabDownloads"
 
     // color_prefs.xml
     const val PREFERENCE_SKIN = "skin"

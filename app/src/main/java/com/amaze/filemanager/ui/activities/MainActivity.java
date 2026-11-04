@@ -54,6 +54,7 @@ import static com.amaze.filemanager.ui.dialogs.SftpConnectDialog.ARG_PROTOCOL;
 import static com.amaze.filemanager.ui.dialogs.SftpConnectDialog.ARG_USERNAME;
 import static com.amaze.filemanager.ui.fragments.FtpServerFragment.REQUEST_CODE_SAF_FTP;
 import static com.amaze.filemanager.ui.fragments.preferencefragments.PreferencesConstants.PREFERENCE_BOOKMARKS_ADDED;
+import static com.amaze.filemanager.ui.fragments.preferencefragments.PreferencesConstants.PREFERENCE_FAB_DOWNLOADS;
 import static com.amaze.filemanager.ui.fragments.preferencefragments.PreferencesConstants.PREFERENCE_NEED_TO_SET_HOME;
 import static com.amaze.filemanager.ui.fragments.preferencefragments.PreferencesConstants.PREFERENCE_VIEW;
 
@@ -1490,6 +1491,7 @@ public class MainActivity extends PermissionsActivity
 
     drawer.refreshDrawer();
     drawer.refactorDrawerLockMode();
+    initializeFabActionViews();
 
     IntentFilter newFilter = new IntentFilter();
     newFilter.addAction(Intent.ACTION_MEDIA_MOUNTED);
@@ -1907,18 +1909,30 @@ public class MainActivity extends PermissionsActivity
   }
 
   public void initializeFabActionViews() {
-    // The bottom-right button is a single "home" button: it jumps back to the root/home path.
+    // The bottom-right button is a single button: it jumps to the home path, or to the Downloads
+    // folder when the user has chosen so in the appearance settings.
     clearFabActionItems();
-    floatingActionButton.setMainFabClosedDrawable(
-        ContextCompat.getDrawable(this, R.drawable.ic_home_white_24dp));
-    floatingActionButton.setMainFabOpenedDrawable(
-        ContextCompat.getDrawable(this, R.drawable.ic_home_white_24dp));
+    final boolean downloadsMode = getBoolean(PREFERENCE_FAB_DOWNLOADS);
+    final int fabIcon =
+        downloadsMode ? R.drawable.ic_file_download_white_24dp : R.drawable.ic_home_white_24dp;
+    floatingActionButton.setMainFabClosedDrawable(ContextCompat.getDrawable(this, fabIcon));
+    floatingActionButton.setMainFabOpenedDrawable(ContextCompat.getDrawable(this, fabIcon));
     floatingActionButton.setOnChangeListener(
         new SpeedDialView.OnChangeListener() {
           @Override
           public boolean onMainActionSelected() {
             MainFragment mainFragment = getCurrentMainFragment();
-            if (mainFragment != null) mainFragment.home();
+            if (mainFragment == null) return true;
+            if (downloadsMode) {
+              mainFragment.loadlist(
+                  Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                      .getAbsolutePath(),
+                  false,
+                  OpenMode.FILE,
+                  false);
+            } else {
+              mainFragment.home();
+            }
             return true;
           }
 

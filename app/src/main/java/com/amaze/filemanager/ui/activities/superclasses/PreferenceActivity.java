@@ -29,6 +29,7 @@ import static com.amaze.filemanager.ui.fragments.preferencefragments.Preferences
 import static com.amaze.filemanager.ui.fragments.preferencefragments.PreferencesConstants.PREFERENCE_NEED_TO_SET_HOME;
 import static com.amaze.filemanager.ui.fragments.preferencefragments.PreferencesConstants.PREFERENCE_ROOTMODE;
 import static com.amaze.filemanager.ui.fragments.preferencefragments.PreferencesConstants.PREFERENCE_ROOT_LEGACY_LISTING;
+import static com.amaze.filemanager.ui.fragments.preferencefragments.PreferencesConstants.PREFERENCE_FAB_DOWNLOADS;
 import static com.amaze.filemanager.ui.fragments.preferencefragments.PreferencesConstants.PREFERENCE_SHOW_DIVIDERS;
 import static com.amaze.filemanager.ui.fragments.preferencefragments.PreferencesConstants.PREFERENCE_SHOW_FILE_SIZE;
 import static com.amaze.filemanager.ui.fragments.preferencefragments.PreferencesConstants.PREFERENCE_SHOW_GOBACK_BUTTON;
@@ -96,6 +97,7 @@ public class PreferenceActivity extends BasicActivity {
       case PREFERENCE_CHANGEPATHS:
       case PREFERENCE_ROOT_LEGACY_LISTING:
       case PREFERENCE_DISABLE_PLAYER_INTENT_FILTERS:
+      case PREFERENCE_FAB_DOWNLOADS:
         defaultValue = false;
         break;
       case PREFERENCE_SHOW_FILE_SIZE:
