@@ -326,6 +326,7 @@ public class MainActivity extends PermissionsActivity
   private boolean listItemSelected = false;
 
   private String scrollToFileName = null;
+  private String scrollToFileFolder = null;
 
   public static final int REQUEST_CODE_CLOUD_LIST_KEYS = 5463;
   public static final int REQUEST_CODE_CLOUD_LIST_KEY = 5472;
@@ -2595,6 +2596,22 @@ public class MainActivity extends PermissionsActivity
 
   public String getScrollToFileName() {
     return this.scrollToFileName;
+  }
+
+  /**
+   * Sets the file the next loaded {@link MainFragment} of [folder] should scroll to and blink.
+   */
+  public void setScrollToFile(String fileName, String folder) {
+    this.scrollToFileName = fileName;
+    this.scrollToFileFolder = folder;
+  }
+
+  public String getScrollToFileFolder() {
+    return this.scrollToFileFolder;
+  }
+
+  public void clearScrollToFile() {
+    setScrollToFile(null, null);
   }
 
   /**

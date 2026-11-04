@@ -96,7 +96,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.UriPermission;
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ArgbEvaluator;
+import android.animation.ValueAnimator;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import androidx.core.graphics.ColorUtils;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -964,20 +970,67 @@ public class MainFragment extends Fragment
         () -> {
           if (!isAdded()) return;
 
-          String fileName = requireMainActivity().getScrollToFileName();
+          MainActivity activity = requireMainActivity();
+          String fileName = activity.getScrollToFileName();
+          String folder = activity.getScrollToFileFolder();
 
-          if (fileName != null)
-            mainFragmentViewModel
-                .getScrollPosition(fileName)
-                .observe(
-                    getViewLifecycleOwner(),
-                    scrollPosition -> {
-                      if (scrollPosition != -1)
-                        listView.scrollToPosition(
-                            Math.min(scrollPosition + 4, adapter.getItemCount() - 1));
-                      adapter.notifyItemChanged(scrollPosition);
-                    });
+          // ignore loads of other folders; the target folder loads later
+          if (fileName != null && (folder == null || isSamePath(folder, getCurrentPath()))) {
+            activity.clearScrollToFile();
+            scrollToAndBlink(fileName);
+          }
         });
+  }
+
+  private static boolean isSamePath(String a, String b) {
+    if (a == null || b == null) return false;
+    return a.replaceAll("/+$", "").equals(b.replaceAll("/+$", ""));
+  }
+
+  /** Scrolls the file named [fileName] to the top of the list and blinks its row. */
+  private void scrollToAndBlink(String fileName) {
+    List<RecyclerAdapter.ListItem> items = mainFragmentViewModel.getAdapterListItems();
+    if (items == null) return;
+
+    int target = -1;
+    for (int i = 0; i < items.size(); i++) {
+      LayoutElementParcelable element = items.get(i).getLayoutElementParcelable();
+      if (element != null && fileName.equals(element.title)) {
+        target = i;
+        break;
+      }
+    }
+    if (target == -1) return;
+
+    final int position = target;
+    ((LinearLayoutManager) listView.getLayoutManager()).scrollToPositionWithOffset(position, 0);
+    // wait for the layout pass so the row view exists
+    listView.postDelayed(
+        () -> {
+          if (!isAdded()) return;
+          RecyclerView.ViewHolder holder = listView.findViewHolderForAdapterPosition(position);
+          if (holder == null) return;
+          View row = holder.itemView;
+          Drawable originalBackground = row.getBackground();
+          ValueAnimator blink =
+              ValueAnimator.ofObject(
+                  new ArgbEvaluator(),
+                  Color.TRANSPARENT,
+                  ColorUtils.setAlphaComponent(requireMainActivity().getAccent(), 150));
+          blink.setDuration(180);
+          blink.setRepeatCount(3);
+          blink.setRepeatMode(ValueAnimator.REVERSE);
+          blink.addUpdateListener(a -> row.setBackgroundColor((int) a.getAnimatedValue()));
+          blink.addListener(
+              new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                  row.setBackground(originalBackground);
+                }
+              });
+          blink.start();
+        },
+        200);
   }
 
   private LayoutElementParcelable getBackElement() {

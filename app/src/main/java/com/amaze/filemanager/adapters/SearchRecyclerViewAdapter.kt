@@ -115,17 +115,21 @@ class SearchRecyclerViewAdapter :
                 val (file, _) = getItem(adapterPosition)
 
                 if (!file.isDirectory) {
-                    file.openFile(
-                        AppConfig.getInstance().mainActivityContext as MainActivity?,
-                        false,
-                    )
+                    // jump to the file inside its folder instead of opening it
+                    val mainActivity = AppConfig.getInstance().mainActivityContext as MainActivity?
+                    val folder = file.path.substring(0, file.path.lastIndexOf("/"))
+                    mainActivity?.setScrollToFile(file.name, folder)
+                    mainActivity?.goToMain(folder)
                 } else {
                     (AppConfig.getInstance().mainActivityContext as MainActivity?)
                         ?.goToMain(file.path)
                 }
 
                 (AppConfig.getInstance().mainActivityContext as MainActivity?)
-                    ?.appbar?.searchView?.hideSearchView()
+                    ?.appbar?.searchView?.run {
+                        saveCurrentSearchToRecents()
+                        hideSearchView()
+                    }
             }
         }
     }

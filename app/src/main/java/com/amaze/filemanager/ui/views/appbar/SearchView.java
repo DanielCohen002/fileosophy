@@ -100,7 +100,6 @@ public class SearchView {
 
   private final AppCompatTextView recentHintTV;
   private final AppCompatTextView searchResultsHintTV;
-  private final AppCompatButton deepSearchButton;
   private final LinearLayout deepSearchContainer;
 
   private final ChipGroup recentChipGroup;
@@ -119,11 +118,6 @@ public class SearchView {
 
   /** The drawable used to indicate that the search results are sorted descending */
   private final Drawable searchResultsSortDescDrawable;
-
-  // 0 -> Basic Search
-  // 1 -> Indexed Search
-  // 2 -> Deep Search
-  private int searchMode;
 
   private boolean enabled = false;
 
@@ -145,7 +139,6 @@ public class SearchView {
     recentChipGroup = mainActivity.findViewById(R.id.searchRecentItemsChipGroup);
     recentHintTV = mainActivity.findViewById(R.id.searchRecentHintTV);
     searchResultsHintTV = mainActivity.findViewById(R.id.searchResultsHintTV);
-    deepSearchButton = mainActivity.findViewById(R.id.tryDeepSearchButton);
     deepSearchContainer = mainActivity.findViewById(R.id.deepSearchContainer);
     recyclerView = mainActivity.findViewById(R.id.searchRecyclerView);
     searchResultsSortHintTV = mainActivity.findViewById(R.id.searchResultsSortHintTV);
@@ -208,42 +201,6 @@ public class SearchView {
           return false;
         });
 
-    deepSearchButton.setOnClickListener(
-        v -> {
-          String s = getSearchTerm();
-
-          cancelLastSearch();
-
-          if (searchMode == 1) {
-
-            saveRecentPreference(s);
-
-            mainActivity
-                .getCurrentMainFragment()
-                .getMainActivityViewModel()
-                .indexedSearch(mainActivity, s)
-                .observe(
-                    mainActivity.getCurrentMainFragment().getViewLifecycleOwner(),
-                    hybridFileParcelables -> updateResultList(hybridFileParcelables, s));
-
-            searchMode = 2;
-
-            deepSearchButton.setText(mainActivity.getString(R.string.try_deep_search));
-
-          } else if (searchMode == 2) {
-
-            mainActivity
-                .getCurrentMainFragment()
-                .getMainActivityViewModel()
-                .deepSearch(mainActivity, s)
-                .observe(
-                    mainActivity.getCurrentMainFragment().getViewLifecycleOwner(),
-                    hybridFileParcelables -> updateResultList(hybridFileParcelables, s));
-
-            deepSearchContainer.setVisibility(View.GONE);
-          }
-        });
-
     initSearchViewColor(mainActivity);
   }
 
@@ -272,17 +229,18 @@ public class SearchView {
     searchResultsHintTV.setVisibility(View.VISIBLE);
     searchResultsSortButton.setVisibility(View.VISIBLE);
     searchResultsSortHintTV.setVisibility(View.VISIBLE);
-    deepSearchContainer.setVisibility(View.VISIBLE);
-    searchMode = 1;
-    deepSearchButton.setText(mainActivity.getString(R.string.try_indexed_search));
-
     mainActivity
         .getCurrentMainFragment()
         .getMainActivityViewModel()
-        .basicSearch(mainActivity, s)
+        .combinedSearch(mainActivity, s)
         .observe(
             mainActivity.getCurrentMainFragment().getViewLifecycleOwner(),
             hybridFileParcelables -> updateResultList(hybridFileParcelables, s));
+  }
+
+  /** Saves the current search term as a recent search, e.g. once a result was opened. */
+  public void saveCurrentSearchToRecents() {
+    saveRecentPreference(getSearchTerm());
   }
 
   private void saveRecentPreference(String s) {
@@ -296,8 +254,10 @@ public class SearchView {
             ? new Gson().fromJson(preferenceString, new TypeToken<ArrayList<String>>() {}.getType())
             : new ArrayList<>();
 
-    if (s.isEmpty() || recentSearches.contains(s)) return;
+    if (s.isEmpty()) return;
 
+    // re-searching a term makes it the most recent again
+    recentSearches.remove(s);
     recentSearches.add(s);
 
     if (recentSearches.size() > 5) recentSearches.remove(0);
@@ -331,6 +291,9 @@ public class SearchView {
     ArrayList<String> recentSearches =
         new Gson().fromJson(preferenceString, new TypeToken<ArrayList<String>>() {}.getType());
 
+    // most recent first
+    Collections.reverse(recentSearches);
+
     for (String string : recentSearches) {
       Chip chip = new Chip(new ContextThemeWrapper(context, R.style.ChipStyle));
 
@@ -352,8 +315,6 @@ public class SearchView {
   }
 
   private void resetSearchMode() {
-    searchMode = 0;
-    deepSearchButton.setText(mainActivity.getString(R.string.try_indexed_search));
     deepSearchContainer.setVisibility(View.GONE);
   }
 

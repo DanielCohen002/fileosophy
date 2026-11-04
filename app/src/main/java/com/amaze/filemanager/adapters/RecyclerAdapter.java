@@ -1477,6 +1477,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         popupMenu.getMenu().findItem(R.id.decrypt).setVisible(true);
       }
     }
+    if (mainFragment.getMainFragmentViewModel().getOpenMode() == OpenMode.CUSTOM) {
+      popupMenu.getMenu().findItem(R.id.jump_to_folder).setVisible(true);
+    }
     if (rowItem.getMode() == OpenMode.TRASH_BIN) {
       popupMenu.getMenu().findItem(R.id.return_select).setVisible(false);
       popupMenu.getMenu().findItem(R.id.cut).setVisible(false);
@@ -1487,6 +1490,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
       popupMenu.getMenu().findItem(R.id.share).setVisible(false);
       popupMenu.getMenu().findItem(R.id.ex).setVisible(false);
       popupMenu.getMenu().findItem(R.id.book).setVisible(false);
+      popupMenu.getMenu().findItem(R.id.jump_to_folder).setVisible(false);
       popupMenu.getMenu().findItem(R.id.restore).setVisible(true);
       popupMenu.getMenu().findItem(R.id.delete).setVisible(true);
     }

@@ -188,6 +188,11 @@ public class ItemPopupMenu extends PopupMenu implements PopupMenu.OnMenuItemClic
           utilitiesProvider,
           false);
       return true;
+    } else if (item.getItemId() == R.id.jump_to_folder) {
+      String folder = rowItem.generateBaseFile().getParent(context);
+      mainActivity.setScrollToFile(rowItem.title, folder);
+      mainActivity.goToMain(folder);
+      return true;
     } else if (item.getItemId() == R.id.return_select) {
       mainFragment.returnIntentResults(new HybridFileParcelable[] {rowItem.generateBaseFile()});
       return true;

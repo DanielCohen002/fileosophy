@@ -26,6 +26,7 @@ import android.provider.MediaStore
 import androidx.collection.LruCache
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.preference.PreferenceManager
@@ -195,6 +196,64 @@ class MainActivityViewModel(val applicationContext: Application) :
 
         lastSearchLiveData = deepSearch.foundFilesLiveData
         return deepSearch.foundFilesLiveData
+    }
+
+    /**
+     * Perform indexed and deep search together, publishing the merged, de-duplicated results
+     */
+    fun combinedSearch(
+        mainActivity: MainActivity,
+        query: String,
+    ): LiveData<List<SearchResult>> {
+        val searchParameters = createSearchParameters(mainActivity)
+        val path = mainActivity.currentMainFragment?.currentPath ?: ""
+        val openMode =
+            mainActivity.currentMainFragment?.mainFragmentViewModel?.openMode ?: OpenMode.FILE
+
+        val deepSearch =
+            DeepSearch(query, path, searchParameters, this.applicationContext, openMode)
+        val indexedSearch =
+            mainActivity
+                .contentResolver
+                .query(
+                    MediaStore.Files.getContentUri("external"),
+                    arrayOf(
+                        MediaStore.Files.FileColumns.DATA,
+                        MediaStore.Files.FileColumns.DISPLAY_NAME,
+                    ),
+                    null,
+                    null,
+                    null,
+                )
+                ?.let { IndexedSearch(query, path, searchParameters, it) }
+
+        val merged = MediatorLiveData<List<SearchResult>>()
+        var deepResults = listOf<SearchResult>()
+        var indexedResults = listOf<SearchResult>()
+        val publishMerged = {
+            val byPath = LinkedHashMap<String, SearchResult>()
+            (deepResults + indexedResults).forEach { byPath.putIfAbsent(it.file.path, it) }
+            merged.value = byPath.values.toList()
+        }
+        merged.addSource(deepSearch.foundFilesLiveData) {
+            deepResults = ArrayList(it)
+            publishMerged()
+        }
+        indexedSearch?.let { search ->
+            merged.addSource(search.foundFilesLiveData) {
+                indexedResults = ArrayList(it)
+                publishMerged()
+            }
+        }
+
+        lastSearchJob =
+            viewModelScope.launch(Dispatchers.IO) {
+                launch { deepSearch.search() }
+                indexedSearch?.let { launch { it.search() } }
+            }
+
+        lastSearchLiveData = merged
+        return merged
     }
 
     private fun createSearchParameters(mainActivity: MainActivity): SearchParameters {

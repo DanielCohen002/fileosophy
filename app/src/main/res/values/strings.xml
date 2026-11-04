@@ -67,6 +67,7 @@
     <string name="stopping">Stopping</string>
     <string name="open_parent">Open Parent Directory</string>
     <string name="open_with">Open with</string>
+    <string name="jump_to_folder">Jump to file</string>
     <string name="share">Share</string>
     <string name="about">About</string>
     <string name="extract">Extract</string>
