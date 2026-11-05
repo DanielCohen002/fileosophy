@@ -59,6 +59,7 @@ import com.amaze.filemanager.filesystem.FileProperties;
 import com.amaze.filemanager.filesystem.CloudSaf;
 import com.amaze.filemanager.filesystem.HybridFile;
 import com.amaze.filemanager.filesystem.HybridFileParcelable;
+import com.amaze.filemanager.filesystem.PasteUndo;
 import com.amaze.filemanager.filesystem.MediaStoreHack;
 import com.amaze.filemanager.filesystem.SafRootHolder;
 import com.amaze.filemanager.filesystem.files.CryptUtil;
@@ -86,6 +87,7 @@ import com.amaze.filemanager.utils.DataUtils;
 import com.amaze.filemanager.utils.GenericExtKt;
 import com.amaze.filemanager.utils.OTGUtil;
 import com.amaze.filemanager.utils.Utils;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.appbar.AppBarLayout;
 
 import android.content.BroadcastReceiver;
@@ -423,6 +425,7 @@ public class MainFragment extends Fragment
             mainActivityViewModel.evictPathFromListCache(getCurrentPath());
           }
           updateList(false);
+          showPasteUndoIfFinished(intent.getStringExtra(MainActivity.KEY_INTENT_LOAD_LIST_FILE));
         }
       };
 
@@ -976,8 +979,8 @@ public class MainFragment extends Fragment
 
           // ignore loads of other folders; the target folder loads later
           if (fileName != null && (folder == null || isSamePath(folder, getCurrentPath()))) {
-            activity.clearScrollToFile();
-            scrollToAndBlink(fileName);
+            // keep the request until the file shows up (a copy may still be running)
+            if (scrollToAndBlink(fileName)) activity.clearScrollToFile();
           }
         });
   }
@@ -988,9 +991,9 @@ public class MainFragment extends Fragment
   }
 
   /** Scrolls the file named [fileName] to the top of the list and blinks its row. */
-  private void scrollToAndBlink(String fileName) {
+  private boolean scrollToAndBlink(String fileName) {
     List<RecyclerAdapter.ListItem> items = mainFragmentViewModel.getAdapterListItems();
-    if (items == null) return;
+    if (items == null) return false;
 
     int target = -1;
     for (int i = 0; i < items.size(); i++) {
@@ -1000,7 +1003,7 @@ public class MainFragment extends Fragment
         break;
       }
     }
-    if (target == -1) return;
+    if (target == -1) return false;
 
     final int position = target;
     ((LinearLayoutManager) listView.getLayoutManager()).scrollToPositionWithOffset(position, 0);
@@ -1031,6 +1034,30 @@ public class MainFragment extends Fragment
           blink.start();
         },
         200);
+    return true;
+  }
+
+  /** Shows an undo popup for the last copy/move once its target folder has been reloaded. */
+  private void showPasteUndoIfFinished(@Nullable String reloadedPath) {
+    MainActivity activity = getMainActivity();
+    if (activity == null) return;
+    PasteUndo undo = activity.getPendingPasteUndo();
+    if (undo == null || reloadedPath == null || !isSamePath(undo.getTargetPath(), reloadedPath)) {
+      return;
+    }
+    int present = undo.countPresent();
+    if (present == 0) return;
+
+    activity.setPendingPasteUndo(null);
+    String message =
+        getString(
+            R.string.paste_done_count,
+            present,
+            getString(undo.isMove() ? R.string.moved : R.string.copied));
+    Snackbar.make(activity.findViewById(R.id.content_frame), message, Snackbar.LENGTH_LONG)
+        .setAction(R.string.undo, v -> undo.undo(activity))
+        .setActionTextColor(activity.getAccent())
+        .show();
   }
 
   private LayoutElementParcelable getBackElement() {

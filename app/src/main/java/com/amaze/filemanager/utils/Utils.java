@@ -357,7 +357,8 @@ public class Utils {
       int length,
       @StringRes int actionTextId,
       Runnable actionCallback,
-      Runnable cancelCallback) {
+      Runnable cancelCallback,
+      Runnable addFolderCallback) {
 
     final Snackbar snackbar =
         Snackbar.make(mainActivity.findViewById(R.id.content_frame), "", length);
@@ -378,6 +379,10 @@ public class Utils {
 
     actionButton.setOnClickListener(v -> actionCallback.run());
     cancelButton.setOnClickListener(v -> cancelCallback.run());
+
+    Button addFolderButton = customSnackView.findViewById(R.id.snackBarAddFolderButton);
+    addFolderButton.setVisibility(View.VISIBLE);
+    addFolderButton.setOnClickListener(v -> addFolderCallback.run());
 
     snackBarLayout.addView(customSnackView, 0);
 

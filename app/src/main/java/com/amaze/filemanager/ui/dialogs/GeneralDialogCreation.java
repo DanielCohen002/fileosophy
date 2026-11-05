@@ -182,6 +182,10 @@ public class GeneralDialogCreation {
     AppCompatEditText textfield = dialogView.findViewById(R.id.singleedittext_input);
     textfield.setHint(hint);
     textfield.setText(prefill);
+    boolean lightDialog =
+        m.getAppTheme().getMaterialDialogTheme() == com.afollestad.materialdialogs.Theme.LIGHT;
+    textfield.setTextColor(lightDialog ? Color.BLACK : Color.WHITE);
+    textfield.setHintTextColor(lightDialog ? Color.GRAY : Color.LTGRAY);
 
     WarnableTextInputLayout tilTextfield =
         dialogView.findViewById(R.id.singleedittext_warnabletextinputlayout);

@@ -167,6 +167,17 @@ public final class PasteHelper implements Parcelable {
                           ArrayList<HybridFileParcelable> arrayList =
                               new ArrayList<>(Arrays.asList(paths));
                           boolean move = operation == PasteHelper.OPERATION_CUT;
+                          PasteUndo undo =
+                              PasteUndo.create(
+                                  mainActivity,
+                                  move,
+                                  mainFragment.getMainFragmentViewModel().getOpenMode(),
+                                  path,
+                                  paths);
+                          mainActivity.setPendingPasteUndo(undo);
+                          if (undo != null) {
+                            mainActivity.setScrollToFile(undo.getFirstName(), path);
+                          }
                           new PreparePasteTask(mainActivity)
                               .execute(
                                   path,
@@ -176,7 +187,17 @@ public final class PasteHelper implements Parcelable {
                                   arrayList);
                           dismissSnackbar(true);
                         },
-                        () -> dismissSnackbar(true));
+                        () -> dismissSnackbar(true),
+                        () -> {
+                          final MainFragment mainFragment = mainActivity.getCurrentMainFragment();
+                          if (mainFragment == null) return;
+                          mainActivity
+                              .mainActivityHelper
+                              .mkdir(
+                                  mainFragment.getMainFragmentViewModel().getOpenMode(),
+                                  mainFragment.getCurrentPath(),
+                                  mainFragment);
+                        });
               }
 
               @Override

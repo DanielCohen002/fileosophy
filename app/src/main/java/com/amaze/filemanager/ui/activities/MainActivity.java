@@ -103,6 +103,7 @@ import com.amaze.filemanager.filesystem.HybridFile;
 import com.amaze.filemanager.filesystem.HybridFileParcelable;
 import com.amaze.filemanager.filesystem.MakeFileOperation;
 import com.amaze.filemanager.filesystem.PasteHelper;
+import com.amaze.filemanager.filesystem.PasteUndo;
 import com.amaze.filemanager.filesystem.RootHelper;
 import com.amaze.filemanager.filesystem.files.FileUtils;
 import com.amaze.filemanager.filesystem.ftp.NetCopyClientConnectionPool;
@@ -1195,7 +1196,7 @@ public class MainActivity extends PermissionsActivity
       menu.findItem(R.id.clear_trash).setVisible(isInTrashBin());
       menu.findItem(R.id.sort).setVisible(true);
       menu.findItem(R.id.hiddenitems).setVisible(false);
-      menu.findItem(R.id.add).setVisible(true);
+      menu.setGroupVisible(R.id.add, true);
       menu.findItem(R.id.view).setVisible(true);
       menu.findItem(R.id.extract).setVisible(false);
       invalidatePasteSnackbar(true);
@@ -1221,7 +1222,7 @@ public class MainActivity extends PermissionsActivity
         menu.findItem(R.id.sortby).setVisible(false);
       }
       menu.findItem(R.id.hiddenitems).setVisible(false);
-      menu.findItem(R.id.add).setVisible(false);
+      menu.setGroupVisible(R.id.add, false);
       menu.findItem(R.id.view).setVisible(false);
       invalidatePasteSnackbar(false);
     } else if (fragment instanceof CompressedExplorerFragment) {
@@ -1235,7 +1236,7 @@ public class MainActivity extends PermissionsActivity
       menu.findItem(R.id.history).setVisible(false);
       menu.findItem(R.id.sort).setVisible(false);
       menu.findItem(R.id.hiddenitems).setVisible(false);
-      menu.findItem(R.id.add).setVisible(false);
+      menu.setGroupVisible(R.id.add, false);
       menu.findItem(R.id.view).setVisible(false);
       menu.findItem(R.id.extract).setVisible(true);
       invalidatePasteSnackbar(false);
@@ -2612,6 +2613,17 @@ public class MainActivity extends PermissionsActivity
 
   public void clearScrollToFile() {
     setScrollToFile(null, null);
+  }
+
+  private PasteUndo pendingPasteUndo = null;
+
+  /** Set when a paste starts; shown as an undo popup once the target folder reloads. */
+  public void setPendingPasteUndo(PasteUndo undo) {
+    this.pendingPasteUndo = undo;
+  }
+
+  public PasteUndo getPendingPasteUndo() {
+    return this.pendingPasteUndo;
   }
 
   /**
