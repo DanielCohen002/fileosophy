@@ -40,7 +40,11 @@
         <item name="windowNoTitle">true</item>
         <item name="windowActionModeOverlay">true</item>
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
-        <item name="popup">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="popup">@style/LeatherPopupOverlayLight</item>
+        <item name="popupMenuStyle">@style/LeatherPopupMenuLight</item>
+        <item name="android:listDivider">@drawable/leather_divider</item>
+        <item name="textAppearanceLargePopupMenu">@style/LeatherPopupTextLight</item>
+        <item name="textAppearanceSmallPopupMenu">@style/LeatherPopupTextSmallLight</item>
         <item name="toolbar_theme">@style/overflow_light</item>
 
     </style>
@@ -65,7 +69,10 @@
         <item name="windowNoTitle">true</item>
         <item name="windowActionModeOverlay">true</item>
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
-        <item name="popup">@style/Theme.AppCompat</item>
+        <item name="popup">@style/LeatherPopupOverlayDark</item>
+        <item name="popupMenuStyle">@style/LeatherPopupMenuDark</item>
+        <item name="textAppearanceLargePopupMenu">@style/LeatherPopupTextDark</item>
+        <item name="textAppearanceSmallPopupMenu">@style/LeatherPopupTextSmallDark</item>
         <item name="toolbar_theme">@style/overflow_dark</item>
     </style>
 
@@ -77,7 +84,7 @@
 
     <style name="appCompatBlack" parent="appCompatDark">
         <item name="android:windowBackground">@android:color/black</item>
-        <item name="popup">@style/overflow_black</item>
+        <item name="popup">@style/LeatherPopupOverlayDark</item>
     </style>
 
     <!-- about activity -->
@@ -344,4 +351,14 @@
         <item name="android:paddingEnd">35dp</item>
     </style>
 
+    <!-- default leather accent -->
+    <style name="pref_accent_light_leather" parent="appCompatLight">
+        <item name="colorAccent">@color/leather_accent</item>
+    </style>
+    <style name="pref_accent_dark_leather" parent="appCompatDark">
+        <item name="colorAccent">@color/leather_accent</item>
+    </style>
+    <style name="pref_accent_black_leather" parent="appCompatBlack">
+        <item name="colorAccent">@color/leather_accent</item>
+    </style>
 </resources>

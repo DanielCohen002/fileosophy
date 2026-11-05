@@ -362,7 +362,60 @@ public class Utils {
 
     final Snackbar snackbar =
         Snackbar.make(mainActivity.findViewById(R.id.content_frame), "", length);
+    View customSnackView = applyCompactSnackbarStyle(mainActivity, snackbar);
 
+    Button actionButton = customSnackView.findViewById(R.id.snackBarActionButton);
+    Button cancelButton = customSnackView.findViewById(R.id.snackBarCancelButton);
+    AppCompatTextView textView = customSnackView.findViewById(R.id.snackBarTextTV);
+
+    actionButton.setText(actionTextId);
+    textView.setText(text);
+
+    actionButton.setOnClickListener(v -> actionCallback.run());
+    cancelButton.setOnClickListener(v -> cancelCallback.run());
+
+    Button addFolderButton = customSnackView.findViewById(R.id.snackBarAddFolderButton);
+    addFolderButton.setVisibility(View.VISIBLE);
+    addFolderButton.setOnClickListener(v -> addFolderCallback.run());
+
+    snackbar.show();
+    return snackbar;
+  }
+
+  /** Shows the same compact accent box as the paste popup, with a single action (e.g. Undo). */
+  public static Snackbar showCompactActionSnackBar(
+      MainActivity mainActivity,
+      CharSequence text,
+      int length,
+      @StringRes int actionTextId,
+      Runnable actionCallback) {
+    final Snackbar snackbar =
+        Snackbar.make(mainActivity.findViewById(R.id.content_frame), "", length);
+    View customSnackView = applyCompactSnackbarStyle(mainActivity, snackbar);
+
+    Button actionButton = customSnackView.findViewById(R.id.snackBarActionButton);
+    customSnackView.findViewById(R.id.snackBarCancelButton).setVisibility(View.GONE);
+    AppCompatTextView textView = customSnackView.findViewById(R.id.snackBarTextTV);
+
+    textView.setText(text);
+    if (actionTextId == 0) {
+      // message only
+      actionButton.setVisibility(View.GONE);
+    } else {
+      actionButton.setText(actionTextId);
+      actionButton.setOnClickListener(
+          v -> {
+            actionCallback.run();
+            snackbar.dismiss();
+          });
+    }
+
+    snackbar.show();
+    return snackbar;
+  }
+
+  /** Replaces the stock snackbar content with the compact accent-colored box; returns its view. */
+  private static View applyCompactSnackbarStyle(MainActivity mainActivity, Snackbar snackbar) {
     View customSnackView =
         View.inflate(mainActivity.getApplicationContext(), R.layout.snackbar_view, null);
     snackbar.getView().setBackgroundColor(Color.TRANSPARENT);
@@ -383,20 +436,6 @@ public class Utils {
     }
     snackBarLayout.setLayoutParams(snackParams);
 
-    Button actionButton = customSnackView.findViewById(R.id.snackBarActionButton);
-    Button cancelButton = customSnackView.findViewById(R.id.snackBarCancelButton);
-    AppCompatTextView textView = customSnackView.findViewById(R.id.snackBarTextTV);
-
-    actionButton.setText(actionTextId);
-    textView.setText(text);
-
-    actionButton.setOnClickListener(v -> actionCallback.run());
-    cancelButton.setOnClickListener(v -> cancelCallback.run());
-
-    Button addFolderButton = customSnackView.findViewById(R.id.snackBarAddFolderButton);
-    addFolderButton.setVisibility(View.VISIBLE);
-    addFolderButton.setOnClickListener(v -> addFolderCallback.run());
-
     // hide the stock snackbar content so only the compact box takes space
     for (int i = 0; i < snackBarLayout.getChildCount(); i++) {
       snackBarLayout.getChildAt(i).setVisibility(View.GONE);
@@ -405,9 +444,7 @@ public class Utils {
 
     ((CardView) snackBarLayout.findViewById(R.id.snackBarCardView))
         .setCardBackgroundColor(mainActivity.getAccent());
-
-    snackbar.show();
-    return snackbar;
+    return customSnackView;
   }
 
   /**

@@ -87,6 +87,11 @@ class AudioPlayerActivity : BasicActivity() {
 
     private var seekBarDragging = false
 
+    override fun finish() {
+        startMainIfTaskRoot()
+        super.finish()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val uri: Uri? = intent.data

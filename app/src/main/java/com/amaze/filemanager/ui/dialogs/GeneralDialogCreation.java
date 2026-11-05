@@ -73,6 +73,7 @@ import com.amaze.filemanager.ui.fragments.preferencefragments.PreferencesConstan
 import com.amaze.filemanager.ui.theme.AppTheme;
 import com.amaze.filemanager.ui.views.WarnableTextInputLayout;
 import com.amaze.filemanager.ui.views.WarnableTextInputValidator;
+import com.amaze.filemanager.utils.EditTextAccentKt;
 import com.amaze.filemanager.utils.Utils;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Legend;
@@ -165,6 +166,19 @@ public class GeneralDialogCreation {
     return dialog;
   }
 
+  /** Gives a dialog the leather look: cream card in light mode, dark leather card otherwise. */
+  public static MaterialDialog.Builder applyLeatherStyle(
+      MaterialDialog.Builder builder, AppTheme appTheme) {
+    boolean light = appTheme.equals(AppTheme.LIGHT);
+    int surface = light ? R.color.leather_cream : R.color.leather_dark_surface;
+    int text = light ? R.color.leather_espresso : R.color.leather_cream;
+    android.content.Context context = builder.getContext();
+    return builder
+        .backgroundColor(androidx.core.content.ContextCompat.getColor(context, surface))
+        .titleColor(androidx.core.content.ContextCompat.getColor(context, text))
+        .contentColor(androidx.core.content.ContextCompat.getColor(context, text));
+  }
+
   public static MaterialDialog showNameDialog(
       final MainActivity m,
       String hint,
@@ -184,24 +198,34 @@ public class GeneralDialogCreation {
     textfield.setText(prefill);
     boolean lightDialog =
         m.getAppTheme().getMaterialDialogTheme() == com.afollestad.materialdialogs.Theme.LIGHT;
-    textfield.setTextColor(lightDialog ? Color.BLACK : Color.WHITE);
-    textfield.setHintTextColor(lightDialog ? Color.GRAY : Color.LTGRAY);
+    textfield.setTextColor(
+        androidx.core.content.ContextCompat.getColor(
+            m, lightDialog ? R.color.leather_espresso : R.color.leather_cream));
+    textfield.setHintTextColor(
+        lightDialog
+            ? androidx.core.content.ContextCompat.getColor(m, R.color.leather_secondary_text)
+            : Color.LTGRAY);
 
     WarnableTextInputLayout tilTextfield =
         dialogView.findViewById(R.id.singleedittext_warnabletextinputlayout);
+    EditTextAccentKt.applyAccent(textfield, accentColor, true);
+    tilTextfield.setHintTextColor(android.content.res.ColorStateList.valueOf(accentColor));
+    tilTextfield.setBoxStrokeColor(accentColor);
 
     dialogView.post(() -> ExtensionsKt.openKeyboard(textfield, m.getApplicationContext()));
 
+    applyLeatherStyle(builder, m.getAppTheme());
     builder
         .customView(dialogView, false)
         .widgetColor(accentColor)
         .theme(m.getAppTheme().getMaterialDialogTheme())
         .title(title)
         .positiveText(positiveButtonText)
+        .positiveColor(accentColor)
         .onPositive(positiveButtonAction);
 
     if (neutralButtonText != null) {
-      builder.neutralText(neutralButtonText);
+      builder.neutralText(neutralButtonText).neutralColor(accentColor);
     }
 
     if (negativeButtonText != null) {

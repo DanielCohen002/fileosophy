@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- three-dot / popup menus in the leather palette -->
+    <style name="LeatherPopupMenuLight" parent="Widget.AppCompat.Light.PopupMenu">
+        <item name="android:popupBackground">@drawable/leather_card_light</item>
+    </style>
+    <style name="LeatherPopupMenuDark" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">@drawable/leather_card_dark</item>
+    </style>
+
+    <style name="LeatherPopupTextLight" parent="TextAppearance.AppCompat.Light.Widget.PopupMenu.Large">
+        <item name="android:textColor">@color/leather_espresso</item>
+    </style>
+    <style name="LeatherPopupTextSmallLight" parent="TextAppearance.AppCompat.Light.Widget.PopupMenu.Small">
+        <item name="android:textColor">@color/leather_secondary_text</item>
+    </style>
+    <style name="LeatherPopupTextDark" parent="TextAppearance.AppCompat.Widget.PopupMenu.Large">
+        <item name="android:textColor">@color/leather_cream</item>
+    </style>
+    <style name="LeatherPopupTextSmallDark" parent="TextAppearance.AppCompat.Widget.PopupMenu.Small">
+        <item name="android:textColor">@color/leather_cream</item>
+    </style>
+
+    <style name="LeatherPopupOverlayLight" parent="ThemeOverlay.AppCompat.Light">
+        <item name="popupMenuStyle">@style/LeatherPopupMenuLight</item>
+        <item name="textAppearanceLargePopupMenu">@style/LeatherPopupTextLight</item>
+        <item name="textAppearanceSmallPopupMenu">@style/LeatherPopupTextSmallLight</item>
+    </style>
+    <style name="LeatherPopupOverlayDark" parent="ThemeOverlay.AppCompat.Dark">
+        <item name="popupMenuStyle">@style/LeatherPopupMenuDark</item>
+        <item name="textAppearanceLargePopupMenu">@style/LeatherPopupTextDark</item>
+        <item name="textAppearanceSmallPopupMenu">@style/LeatherPopupTextSmallDark</item>
+    </style>
+</resources>

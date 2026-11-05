@@ -1054,10 +1054,8 @@ public class MainFragment extends Fragment
             R.string.paste_done_count,
             present,
             getString(undo.isMove() ? R.string.moved : R.string.copied));
-    Snackbar.make(activity.findViewById(R.id.content_frame), message, Snackbar.LENGTH_LONG)
-        .setAction(R.string.undo, v -> undo.undo(activity))
-        .setActionTextColor(activity.getAccent())
-        .show();
+    Utils.showCompactActionSnackBar(
+        activity, message, Snackbar.LENGTH_LONG, R.string.undo, () -> undo.undo(activity));
   }
 
   private LayoutElementParcelable getBackElement() {
@@ -1146,6 +1144,16 @@ public class MainFragment extends Fragment
               String name1 = textfield.getText().toString().trim();
               String targetParent = f.getParent(requireContext());
 
+              if (name1.equals(f.getName(getMainActivity()))) {
+                Utils.showCompactActionSnackBar(
+                    getMainActivity(),
+                    getString(R.string.no_changes_while_rename),
+                    Snackbar.LENGTH_SHORT,
+                    0,
+                    null);
+                return;
+              }
+
               getMainActivity()
                   .mainActivityHelper
                   .rename(
@@ -1166,10 +1174,6 @@ public class MainFragment extends Fragment
               } else if (text.length() < 1) {
                 return new WarnableTextInputValidator.ReturnState(
                     WarnableTextInputValidator.ReturnState.STATE_ERROR, R.string.field_empty);
-              } else if (text.equals(f.getName(getMainActivity()))) {
-                return new WarnableTextInputValidator.ReturnState(
-                    WarnableTextInputValidator.ReturnState.STATE_WARNING,
-                    R.string.no_changes_while_rename);
               }
 
               return new WarnableTextInputValidator.ReturnState();

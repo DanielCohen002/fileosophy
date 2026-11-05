@@ -41,11 +41,13 @@ import com.amaze.filemanager.fileoperations.filesystem.OpenMode;
 import com.amaze.filemanager.filesystem.EditableFileAbstraction;
 import com.amaze.filemanager.filesystem.HybridFileParcelable;
 import com.amaze.filemanager.filesystem.files.FileUtils;
+import com.amaze.filemanager.ui.activities.ReturnToMainKt;
 import com.amaze.filemanager.ui.activities.superclasses.ThemedActivity;
 import com.amaze.filemanager.ui.dialogs.GeneralDialogCreation;
 import com.amaze.filemanager.ui.theme.AppTheme;
 import com.amaze.filemanager.utils.OnAsyncTaskFinished;
 import com.amaze.filemanager.utils.OnProgressUpdate;
+import com.amaze.filemanager.utils.EditTextAccentKt;
 import com.amaze.filemanager.utils.Utils;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -155,8 +157,28 @@ public class TextEditorActivity extends ThemedActivity
       mainTextView.setBackgroundColor(Utils.getColor(this, android.R.color.black));
       mainTextView.setTextColor(Utils.getColor(this, R.color.primary_white));
     } else {
-      mainTextView.setTextColor(Utils.getColor(this, R.color.primary_grey_900));
+      // transparent so the themed window background (leather) shows through
+      mainTextView.setBackgroundColor(android.graphics.Color.TRANSPARENT);
+      mainTextView.setTextColor(Utils.getColor(this, android.R.color.black));
     }
+    mainTextView.setHintTextColor(
+        getAppTheme().equals(AppTheme.LIGHT)
+            ? android.graphics.Color.GRAY
+            : android.graphics.Color.LTGRAY);
+    mainTextView.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 18);
+    EditTextAccentKt.applyAccent(mainTextView, getAccent(), false);
+    EditTextAccentKt.applyAccent(searchEditText, getAccent(), false);
+
+    // predictive back skips onBackPressed(), so the unsaved-changes prompt needs a real callback
+    getOnBackPressedDispatcher()
+        .addCallback(
+            this,
+            new androidx.activity.OnBackPressedCallback(true) {
+              @Override
+              public void handleOnBackPressed() {
+                checkUnsavedChanges();
+              }
+            });
 
     if (mainTextView.getTypeface() == null) {
       mainTextView.setTypeface(Typeface.DEFAULT);
@@ -200,7 +222,10 @@ public class TextEditorActivity extends ThemedActivity
         && mainTextView.isShown()
         && mainTextView.getText() != null
         && !viewModel.getOriginal().equals(mainTextView.getText().toString())) {
-      new MaterialDialog.Builder(this)
+      MaterialDialog.Builder dialogBuilder = new MaterialDialog.Builder(this);
+      GeneralDialogCreation.applyLeatherStyle(dialogBuilder, getAppTheme());
+      dialogBuilder
+          .theme(getAppTheme().getMaterialDialogTheme())
           .title(R.string.unsaved_changes)
           .content(R.string.unsaved_changes_description)
           .positiveText(R.string.yes)
@@ -267,8 +292,9 @@ public class TextEditorActivity extends ThemedActivity
   }
 
   @Override
-  public void onBackPressed() {
-    checkUnsavedChanges();
+  public void finish() {
+    ReturnToMainKt.startMainIfTaskRoot(this);
+    super.finish();
   }
 
   @Override

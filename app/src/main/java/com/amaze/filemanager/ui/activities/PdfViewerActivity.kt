@@ -159,6 +159,11 @@ class PdfViewerActivity : AppCompatActivity() {
         }
     }
 
+    override fun finish() {
+        startMainIfTaskRoot()
+        super.finish()
+    }
+
     private fun fail(message: Int) =
         runOnUiThread {
             Toast.makeText(this, message, Toast.LENGTH_LONG).show()

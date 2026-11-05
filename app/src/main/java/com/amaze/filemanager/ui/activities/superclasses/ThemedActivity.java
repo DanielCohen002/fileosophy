@@ -377,6 +377,14 @@ public class ThemedActivity extends PreferenceActivity {
           else if (theme.equals(AppTheme.BLACK)) setTheme(R.style.pref_accent_black_super_su);
           else setTheme(R.style.pref_accent_dark_super_su);
           break;
+
+        default:
+          // any other accent (including the leather default): base theme with leather accent,
+          // otherwise the manifest's dark theme and the default teal accent leak through
+          if (theme.equals(AppTheme.LIGHT)) setTheme(R.style.pref_accent_light_leather);
+          else if (theme.equals(AppTheme.BLACK)) setTheme(R.style.pref_accent_black_leather);
+          else setTheme(R.style.pref_accent_dark_leather);
+          break;
       }
     } else {
       if (theme.equals(AppTheme.LIGHT)) {
