@@ -25,6 +25,11 @@
         android:icon="@drawable/ic_share_white_24dp"
         app:showAsAction="always" />
     <item
+        android:id="@+id/cut"
+        android:title="@string/cut"
+        android:icon="@drawable/ic_content_cut_white_36dp"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/cpy"
         android:title="@string/copy"
         android:icon="@drawable/ic_content_copy_white_24dp"
@@ -45,11 +50,6 @@
         android:id="@+id/openparent"
         android:visible="false"
         android:title="@string/open_parent" />
-    <item
-        android:id="@+id/cut"
-        android:title="@string/cut"
-        android:icon="@drawable/ic_content_cut_white_36dp"
-        app:showAsAction="always" />
     <item
         android:id="@+id/all"
         android:title="@string/select_all"

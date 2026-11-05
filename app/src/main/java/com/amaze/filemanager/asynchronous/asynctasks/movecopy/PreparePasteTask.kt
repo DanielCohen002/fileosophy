@@ -227,14 +227,25 @@ class PreparePasteTask(strongRefMain: MainActivity) {
         val checkBox: AppCompatCheckBox = copyDialogBinding.checkBox
 
         Utils.setTint(contextRef, checkBox, accentColor)
+        val textColor =
+            if (contextRef.appTheme.getMaterialDialogTheme() == com.afollestad.materialdialogs.Theme.DARK) {
+                android.graphics.Color.WHITE
+            } else {
+                android.graphics.Color.BLACK
+            }
+        copyDialogBinding.fileAlreadyExists.setTextColor(accentColor)
+        copyDialogBinding.fileAlreadyExists.setTypeface(null, android.graphics.Typeface.BOLD)
+        copyDialogBinding.fileNameText.setTextColor(textColor)
+        checkBox.setTextColor(textColor)
+        checkBox.buttonTintList = android.content.res.ColorStateList.valueOf(textColor)
         dialogBuilder.theme(contextRef.appTheme.getMaterialDialogTheme())
         dialogBuilder.title(contextRef.resources.getString(R.string.paste))
-        dialogBuilder.positiveText(R.string.rename)
+        dialogBuilder.positiveText(R.string.overwrite)
         dialogBuilder.neutralText(R.string.skip)
         dialogBuilder.positiveColor(accentColor)
         dialogBuilder.negativeColor(accentColor)
         dialogBuilder.neutralColor(accentColor)
-        dialogBuilder.negativeText(R.string.overwrite)
+        dialogBuilder.negativeText(R.string.rename)
         dialogBuilder.cancelable(false)
         showDialog(
             conflictingFiles,
@@ -258,7 +269,7 @@ class PreparePasteTask(strongRefMain: MainActivity) {
             copyDialogBinding.fileNameText.text = hybridFileParcelable.name
             val dialog = dialogBuilder.build()
             if (hybridFileParcelable.getParent(context.get()) == targetPath) {
-                dialog.getActionButton(DialogAction.NEGATIVE)
+                dialog.getActionButton(DialogAction.POSITIVE)
                     .isEnabled = false
             }
             val resultDeferred = CompletableDeferred<DialogAction>()
@@ -275,17 +286,17 @@ class PreparePasteTask(strongRefMain: MainActivity) {
             when (resultDeferred.await()) {
                 DialogAction.POSITIVE -> {
                     if (checkBox.isChecked) {
-                        renameAll = true
-                        return
-                    }
-                    conflictingDirActionMap[hybridFileParcelable] = Action.RENAME
-                }
-                DialogAction.NEGATIVE -> {
-                    if (checkBox.isChecked) {
                         overwriteAll = true
                         return
                     }
                     conflictingDirActionMap[hybridFileParcelable] = Action.OVERWRITE
+                }
+                DialogAction.NEGATIVE -> {
+                    if (checkBox.isChecked) {
+                        renameAll = true
+                        return
+                    }
+                    conflictingDirActionMap[hybridFileParcelable] = Action.RENAME
                 }
                 DialogAction.NEUTRAL -> {
                     if (checkBox.isChecked) {

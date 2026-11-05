@@ -370,6 +370,19 @@ public class Utils {
     Snackbar.SnackbarLayout snackBarLayout = (Snackbar.SnackbarLayout) snackbar.getView();
     snackBarLayout.setPadding(0, 0, 0, 0);
 
+    // Compact box pinned to the right instead of a full-width ribbon
+    android.view.ViewGroup.LayoutParams snackParams = snackBarLayout.getLayoutParams();
+    snackParams.width = android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+    if (snackParams instanceof android.widget.FrameLayout.LayoutParams) {
+      ((android.widget.FrameLayout.LayoutParams) snackParams).gravity =
+          android.view.Gravity.BOTTOM | android.view.Gravity.END;
+    } else if (snackParams
+        instanceof androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) {
+      ((androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams) snackParams).gravity =
+          android.view.Gravity.BOTTOM | android.view.Gravity.END;
+    }
+    snackBarLayout.setLayoutParams(snackParams);
+
     Button actionButton = customSnackView.findViewById(R.id.snackBarActionButton);
     Button cancelButton = customSnackView.findViewById(R.id.snackBarCancelButton);
     AppCompatTextView textView = customSnackView.findViewById(R.id.snackBarTextTV);
@@ -384,6 +397,10 @@ public class Utils {
     addFolderButton.setVisibility(View.VISIBLE);
     addFolderButton.setOnClickListener(v -> addFolderCallback.run());
 
+    // hide the stock snackbar content so only the compact box takes space
+    for (int i = 0; i < snackBarLayout.getChildCount(); i++) {
+      snackBarLayout.getChildAt(i).setVisibility(View.GONE);
+    }
     snackBarLayout.addView(customSnackView, 0);
 
     ((CardView) snackBarLayout.findViewById(R.id.snackBarCardView))
