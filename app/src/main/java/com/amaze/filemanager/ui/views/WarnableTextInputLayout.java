@@ -24,9 +24,14 @@ import com.amaze.filemanager.R;
 import com.google.android.material.textfield.TextInputLayout;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.util.AttributeSet;
+import android.widget.EditText;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.ColorUtils;
 import androidx.annotation.StringRes;
 
 /**
@@ -51,6 +56,7 @@ public class WarnableTextInputLayout extends TextInputLayout {
     if (isStyleWarning) {
       setErrorEnabled(true);
       setErrorTextAppearance(R.style.error_inputTextLayout);
+      setErrorTextColor(null);
       isStyleWarning = false;
     }
     super.setError(error);
@@ -63,6 +69,16 @@ public class WarnableTextInputLayout extends TextInputLayout {
       setErrorTextAppearance(R.style.warning_inputTextLayout);
       isStyleWarning = true;
     }
+    setErrorTextColor(ColorStateList.valueOf(getWarningColor()));
     super.setError(getContext().getString(text));
+  }
+
+  /** Warning color that stays readable on both light and dark dialogs. */
+  public @ColorInt int getWarningColor() {
+    EditText editText = getEditText();
+    boolean isLightBackground =
+        editText != null && ColorUtils.calculateLuminance(editText.getCurrentTextColor()) < 0.5;
+    return ContextCompat.getColor(
+        getContext(), isLightBackground ? R.color.warningColorOnLight : R.color.warningColor);
   }
 }

@@ -117,6 +117,8 @@
 
     <!-- Warning error for InputTextLayout -->
     <color name="warningColor">#ffe082</color>
+    <!-- Warning color readable on light dialog backgrounds -->
+    <color name="warningColorOnLight">#9A5B00</color>
     <!-- Error error for InputTextLayout -->
     <color name="error_color_material">#F4511E</color>
 

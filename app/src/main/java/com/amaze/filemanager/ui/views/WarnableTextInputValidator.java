@@ -115,6 +115,13 @@ public final class WarnableTextInputValidator extends SimpleTextWatcher
   private void setEditTextIcon(@DrawableRes Integer drawable) {
     @DrawableRes int drawableInt = drawable != null ? drawable : 0;
     editText.setCompoundDrawablesWithIntrinsicBounds(0, 0, drawableInt, 0);
+    if (drawableInt == warningDrawable) {
+      android.graphics.drawable.Drawable[] icons = editText.getCompoundDrawables();
+      if (icons[2] != null) {
+        icons[2] = icons[2].mutate();
+        icons[2].setTint(textInputLayout.getWarningColor());
+      }
+    }
   }
 
   public interface OnTextValidate {
