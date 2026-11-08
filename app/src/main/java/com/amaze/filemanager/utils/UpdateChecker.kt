@@ -109,7 +109,7 @@ object UpdateChecker {
                 (0 until assets.length())
                     .map { assets.getJSONObject(it) }
                     .firstOrNull { it.getString("name").endsWith(".apk") }
-                    ?.getString("browser_download_url")
+                    ?.getString("url")
                     ?: throw IllegalStateException("release has no apk")
             return Release(
                 json.getString("tag_name").removePrefix("v"),
@@ -193,8 +193,11 @@ object UpdateChecker {
                     }
                     .onFailure {
                         log.warn("failed to download update", it)
-                        Toast.makeText(activity, R.string.update_download_failed, Toast.LENGTH_LONG)
-                            .show()
+                        Toast.makeText(
+                            activity,
+                            activity.getString(R.string.update_download_failed, it.message),
+                            Toast.LENGTH_LONG,
+                        ).show()
                     }
             }
         }.start()
@@ -225,6 +228,8 @@ object UpdateChecker {
             connection.connectTimeout = TIMEOUT_MS
             connection.readTimeout = TIMEOUT_MS
             connection.setRequestProperty("User-Agent", "Fileosophy")
+            // the asset address of the API, which hands out the file itself
+            connection.setRequestProperty("Accept", "application/octet-stream")
             if (connection.responseCode != HttpURLConnection.HTTP_OK) {
                 throw IllegalStateException("download answered ${connection.responseCode}")
             }
