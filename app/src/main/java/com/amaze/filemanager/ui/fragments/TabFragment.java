@@ -44,19 +44,23 @@ import com.amaze.filemanager.ui.drag.DragToTrashListener;
 import com.amaze.filemanager.ui.drag.TabFragmentSideDragListener;
 import com.amaze.filemanager.ui.fragments.preferencefragments.PreferencesConstants;
 import com.amaze.filemanager.ui.views.Indicator;
+import com.amaze.filemanager.ui.views.PaneTouchLayout;
 import com.amaze.filemanager.utils.DataUtils;
 import com.amaze.filemanager.utils.Utils;
 
 import android.animation.ArgbEvaluator;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.HapticFeedbackConstants;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.animation.DecelerateInterpolator;
 
 import androidx.annotation.ColorInt;
@@ -65,10 +69,12 @@ import androidx.annotation.Nullable;
 import androidx.annotation.VisibleForTesting;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.Guideline;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -84,12 +90,32 @@ public class TabFragment extends Fragment {
 
   public static final int TAB_COUNT = 3;
 
+  private static final float SPLIT_CENTER = 0.5f;
+  private static final float SPLIT_MIN = 0.2f;
+  private static final float SPLIT_MAX = 0.8f;
+
+  /** how close to the middle the divider has to get before it sticks there */
+  private static final float SPLIT_SNAP_RANGE = 0.04f;
+
   private boolean savePaths;
   private FragmentManager fragmentManager;
 
   @VisibleForTesting public final List<Fragment> fragments = new ArrayList<>();
   private ScreenSlidePagerAdapter sectionsPagerAdapter;
   private ViewPager2 viewPager;
+
+  /** true while two windows are shown next to each other instead of sliding */
+  private boolean sideBySide;
+
+  /** index of the window that actions apply to, tracked separately while side by side */
+  private int activePane;
+
+  private boolean pagingEnabled = true;
+  private View paneMarkerLeft, paneMarkerRight, paneHandle;
+  private Guideline paneSplit;
+
+  /** where the divider sits while side by side, as a fraction of the width from the left */
+  private float splitFraction = SPLIT_CENTER;
   private SharedPreferences sharedPrefs;
   private String path;
 
@@ -125,6 +151,38 @@ public class TabFragment extends Fragment {
     savePaths = sharedPrefs.getBoolean(PREFERENCE_SAVED_PATHS, DEFAULT_SAVED_PATHS);
 
     viewPager = rootView.findViewById(R.id.pager);
+    paneMarkerLeft = rootView.findViewById(R.id.pane_marker_left);
+    paneMarkerRight = rootView.findViewById(R.id.pane_marker_right);
+    paneHandle = rootView.findViewById(R.id.pane_handle);
+    paneSplit = rootView.findViewById(R.id.pane_split);
+    paneHandle.setOnTouchListener(new SplitHandleTouchListener());
+    viewPager.addOnLayoutChangeListener(
+        (v, l, t, r, b, ol, ot, or, ob) -> {
+          if (sideBySide) updatePaneWidths();
+        });
+    getPagerRecyclerView()
+        .addOnChildAttachStateChangeListener(
+            new RecyclerView.OnChildAttachStateChangeListener() {
+              @Override
+              public void onChildViewAttachedToWindow(@NonNull View page) {
+                updatePaneWidth(page);
+              }
+
+              @Override
+              public void onChildViewDetachedFromWindow(@NonNull View page) {
+                // nothing to do
+              }
+            });
+    ((PaneTouchLayout) rootView)
+        .setDownListener(
+            (x, y) -> {
+              boolean onHandle = x >= paneHandle.getLeft() && x <= paneHandle.getRight();
+              if (!sideBySide || onHandle) return;
+              int pane = x < viewPager.getWidth() * splitFraction ? 0 : 1;
+              if (pane == activePane) return;
+              clearSelectionOfActivePane();
+              activatePane(pane);
+            });
 
     boolean hideFab = false;
     if (getArguments() != null) {
@@ -169,6 +227,8 @@ public class TabFragment extends Fragment {
     }
 
     if (indicator != null) indicator.setViewPager(viewPager);
+
+    applyWindowLayout();
 
     UserColorPreferences userColorPreferences = requireMainActivity().getCurrentColorPreference();
 
@@ -255,15 +315,241 @@ public class TabFragment extends Fragment {
         if (fragments.size() > 2 && fragments.get(2) != null && fragments.get(2).isAdded()) {
           fragmentManager.putFragment(outState, KEY_FRAGMENT_2, fragments.get(2));
         }
-        outState.putInt(KEY_POSITION, viewPager.getCurrentItem());
+        outState.putInt(KEY_POSITION, currentPane());
       } catch (IllegalStateException e) {
         LOG.warn("Failed to save fragment states", e);
       }
     }
   }
 
+  /** number of sliding windows to show: 2 by default, 3 if enabled in Interface settings */
+  private int windowCount() {
+    SharedPreferences prefs =
+        sharedPrefs != null
+            ? sharedPrefs
+            : PreferenceManager.getDefaultSharedPreferences(requireActivity());
+    return prefs.getBoolean(PreferencesConstants.PREFERENCE_THIRD_WINDOW, false) ? 3 : 2;
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    // the option may have been toggled in settings
+    if (viewPager != null && sectionsPagerAdapter != null && fragments.size() == TAB_COUNT) {
+      int count = windowCount();
+      if (viewPager.getAdapter() != null && viewPager.getAdapter().getItemCount() != count) {
+        if (viewPager.getCurrentItem() >= count) viewPager.setCurrentItem(count - 1, false);
+        sectionsPagerAdapter.notifyDataSetChanged();
+      }
+    }
+  }
+
   public void setPagingEnabled(boolean isPaging) {
-    viewPager.setUserInputEnabled(isPaging);
+    pagingEnabled = isPaging;
+    viewPager.setUserInputEnabled(isPaging && !sideBySide);
+  }
+
+  private RecyclerView getPagerRecyclerView() {
+    return (RecyclerView) viewPager.getChildAt(0);
+  }
+
+  private int currentPane() {
+    return sideBySide ? activePane : viewPager.getCurrentItem();
+  }
+
+  public boolean isSideBySide() {
+    return sideBySide;
+  }
+
+  private boolean isLandscape() {
+    return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+  }
+
+  private boolean wantsSideBySide() {
+    boolean landscape = isLandscape();
+    return sharedPrefs.getBoolean(
+        landscape
+            ? PreferencesConstants.PREFERENCE_SIDE_BY_SIDE_LANDSCAPE
+            : PreferencesConstants.PREFERENCE_SIDE_BY_SIDE_PORTRAIT,
+        landscape);
+  }
+
+  /** flips side by side for the current orientation, called from the top bar switch */
+  public void toggleSideBySide() {
+    sharedPrefs
+        .edit()
+        .putBoolean(
+            isLandscape()
+                ? PreferencesConstants.PREFERENCE_SIDE_BY_SIDE_LANDSCAPE
+                : PreferencesConstants.PREFERENCE_SIDE_BY_SIDE_PORTRAIT,
+            !wantsSideBySide())
+        .apply();
+    applyWindowLayout();
+  }
+
+  /**
+   * Side by side is done by padding the pager so that the next page peeks into the right half. This
+   * keeps every window a normal pager page, so their fragment lifecycles stay as they were. Only
+   * the first two windows are shown, and paging is off until the user switches back to sliding.
+   */
+  private void applyWindowLayout() {
+    if (viewPager == null || fragments.size() != TAB_COUNT) return;
+    boolean wanted = wantsSideBySide();
+    if (wanted == sideBySide) {
+      updatePaneMarkers();
+      return;
+    }
+    if (wanted) {
+      activePane = Math.min(viewPager.getCurrentItem(), 1);
+      sideBySide = true;
+      splitFraction = SPLIT_CENTER;
+      viewPager.setUserInputEnabled(false);
+      // scroll first: the widths only change how the pages are laid out, not where they start
+      viewPager.setCurrentItem(0, false);
+      paneSplit.setGuidelinePercent(splitFraction);
+      updatePaneWidths();
+    } else {
+      sideBySide = false;
+      viewPager.setUserInputEnabled(pagingEnabled);
+      updatePaneWidths();
+      showActivePaneAfterLayout();
+    }
+    getPagerRecyclerView().post(() -> getPagerRecyclerView().requestLayout());
+    updatePaneMarkers();
+    refreshListTextSizes();
+  }
+
+  private void refreshListTextSizes() {
+    for (Fragment fragment : fragments) {
+      if (fragment instanceof MainFragment && ((MainFragment) fragment).adapter != null) {
+        ((MainFragment) fragment).adapter.notifyDataSetChanged();
+      }
+    }
+  }
+
+  /**
+   * Scrolling to a page that is already fully visible does nothing, so the pages have to be back
+   * at full width and laid out before going to the window that was touched last.
+   */
+  private void showActivePaneAfterLayout() {
+    ViewTreeObserver observer = viewPager.getViewTreeObserver();
+    observer.addOnGlobalLayoutListener(
+        new ViewTreeObserver.OnGlobalLayoutListener() {
+          @Override
+          public void onGlobalLayout() {
+            if (viewPager.getViewTreeObserver().isAlive()) {
+              viewPager.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+            }
+            if (sideBySide) return;
+            viewPager.setCurrentItem(activePane, false);
+            onPaneActivated(activePane);
+          }
+        });
+    getPagerRecyclerView().requestLayout();
+  }
+
+  private void updatePaneWidths() {
+    RecyclerView pages = getPagerRecyclerView();
+    for (int i = 0; i < pages.getChildCount(); i++) {
+      updatePaneWidth(pages.getChildAt(i));
+    }
+  }
+
+  /**
+   * The pager requires every page to be match_parent, so a window is narrowed with margins instead.
+   * Each page still takes a full pager width of layout space: the first window leaves the rest of
+   * it as right margin, and the second pulls itself back to the divider with a negative left
+   * margin. Other windows stay full width.
+   */
+  private void updatePaneWidth(@NonNull View page) {
+    int width = viewPager.getWidth();
+    int position = getPagerRecyclerView().getChildViewHolder(page).getAdapterPosition();
+    int left = Math.round(splitFraction * width);
+    int marginLeft = 0;
+    int marginRight = 0;
+    if (sideBySide && width > 0) {
+      if (position == 0) {
+        marginRight = width - left;
+      } else if (position == 1) {
+        marginLeft = -(width - left);
+        marginRight = width;
+      }
+    }
+    RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) page.getLayoutParams();
+    if (params.leftMargin != marginLeft || params.rightMargin != marginRight) {
+      params.leftMargin = marginLeft;
+      params.rightMargin = marginRight;
+      page.setLayoutParams(params);
+    }
+  }
+
+  private void setSplitFraction(float fraction) {
+    splitFraction = fraction;
+    paneSplit.setGuidelinePercent(fraction);
+    updatePaneWidths();
+  }
+
+  /** drags the divider, sticking to the middle and buzzing when it gets there */
+  private class SplitHandleTouchListener implements View.OnTouchListener {
+    private boolean snapped;
+
+    @Override
+    public boolean onTouch(View handle, MotionEvent event) {
+      switch (event.getActionMasked()) {
+        case MotionEvent.ACTION_DOWN:
+          handle.getParent().requestDisallowInterceptTouchEvent(true);
+          snapped = splitFraction == SPLIT_CENTER;
+          return true;
+        case MotionEvent.ACTION_MOVE:
+          int[] origin = new int[2];
+          viewPager.getLocationOnScreen(origin);
+          float fraction = (event.getRawX() - origin[0]) / viewPager.getWidth();
+          fraction = Math.max(SPLIT_MIN, Math.min(SPLIT_MAX, fraction));
+          boolean nearCenter = Math.abs(fraction - SPLIT_CENTER) < SPLIT_SNAP_RANGE;
+          if (nearCenter) fraction = SPLIT_CENTER;
+          if (nearCenter && !snapped) {
+            handle.performHapticFeedback(
+                HapticFeedbackConstants.LONG_PRESS,
+                HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING);
+          }
+          snapped = nearCenter;
+          if (fraction != splitFraction) setSplitFraction(fraction);
+          return true;
+        case MotionEvent.ACTION_UP:
+        case MotionEvent.ACTION_CANCEL:
+          return true;
+        default:
+          return false;
+      }
+    }
+  }
+
+  private void updatePaneMarkers() {
+    paneHandle.setVisibility(sideBySide ? View.VISIBLE : View.GONE);
+    if (indicator != null) indicator.setVisibility(sideBySide ? View.GONE : View.VISIBLE);
+    paneMarkerLeft.setVisibility(
+        sideBySide ? (activePane == 0 ? View.VISIBLE : View.INVISIBLE) : View.GONE);
+    paneMarkerRight.setVisibility(
+        sideBySide ? (activePane == 1 ? View.VISIBLE : View.INVISIBLE) : View.GONE);
+    int accent = requireMainActivity().getAccent();
+    paneMarkerLeft.setBackgroundColor(accent);
+    paneMarkerRight.setBackgroundColor(accent);
+  }
+
+  /** only one window can have a selection, so touching the other one ends it */
+  private void clearSelectionOfActivePane() {
+    MainFragment selected = requireMainActivity().getCurrentMainFragment();
+    if (selected != null
+        && selected.adapter != null
+        && requireMainActivity().getListItemSelected()) {
+      selected.adapter.toggleChecked(false, selected.getCurrentPath());
+    }
+  }
+
+  private void activatePane(int pane) {
+    activePane = pane;
+    updatePaneMarkers();
+    onPaneActivated(pane);
   }
 
   public void setCurrentItem(int index) {
@@ -274,6 +560,7 @@ public class TabFragment extends Fragment {
 
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+      if (sideBySide) return;
       final MainFragment mainFragment = requireMainActivity().getCurrentMainFragment();
       if (mainFragment == null
           || mainFragment.getMainFragmentViewModel() == null
@@ -301,6 +588,20 @@ public class TabFragment extends Fragment {
 
     @Override
     public void onPageSelected(int p1) {
+      if (sideBySide) return;
+      activePane = p1;
+      onPaneActivated(p1);
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+      // nothing to do
+    }
+  }
+
+  /** makes the window at the given index the one that toolbar, bottom bar and actions refer to */
+  private void onPaneActivated(int p1) {
+    {
       requireMainActivity()
           .getAppbar()
           .getAppbarLayout()
@@ -327,11 +628,6 @@ public class TabFragment extends Fragment {
           requireMainActivity().showFab();
         }
       }
-    }
-
-    @Override
-    public void onPageScrollStateChanged(int state) {
-      // nothing to do
     }
   }
 
@@ -384,7 +680,7 @@ public class TabFragment extends Fragment {
 
     @Override
     public int getItemCount() {
-      return fragments.size();
+      return Math.min(fragments.size(), windowCount());
     }
 
     @NonNull
@@ -485,7 +781,7 @@ public class TabFragment extends Fragment {
   }
 
   public Fragment getCurrentTabFragment() {
-    if (fragments.size() == TAB_COUNT) return fragments.get(viewPager.getCurrentItem());
+    if (fragments.size() == TAB_COUNT) return fragments.get(currentPane());
     else return null;
   }
 
@@ -519,7 +815,8 @@ public class TabFragment extends Fragment {
       initLeftAndRightDragListeners(destroy);
     }
     for (Fragment fragment : fragments) {
-      if (fragment instanceof MainFragment) {
+      // a window that is switched off has no view
+      if (fragment instanceof MainFragment && fragment.getView() != null) {
         MainFragment m = (MainFragment) fragment;
         m.initTopAndEmptyAreaDragListeners(destroy);
       }
@@ -546,7 +843,7 @@ public class TabFragment extends Fragment {
       leftPlaceholder.setOnDragListener(
           new TabFragmentSideDragListener(
               () -> {
-                if (viewPager.getCurrentItem() > 0) {
+                if (!sideBySide && viewPager.getCurrentItem() > 0) {
                   if (mainFragment != null) {
                     dataUtils.setCheckedItemsList(mainFragment.adapter.getCheckedItems());
                     requireMainActivity().getActionModeHelper().disableActionMode();
@@ -558,7 +855,7 @@ public class TabFragment extends Fragment {
       rightPlaceholder.setOnDragListener(
           new TabFragmentSideDragListener(
               () -> {
-                if (viewPager.getCurrentItem() < TAB_COUNT - 1) {
+                if (!sideBySide && viewPager.getCurrentItem() < windowCount() - 1) {
                   if (mainFragment != null) {
                     dataUtils.setCheckedItemsList(mainFragment.adapter.getCheckedItems());
                     requireMainActivity().getActionModeHelper().disableActionMode();

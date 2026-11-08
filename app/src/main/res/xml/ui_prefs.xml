@@ -26,6 +26,11 @@
         app:title="@string/back_title" />
     <com.amaze.filemanager.ui.views.preference.CheckBox
         app:defaultValue="false"
+        app:key="third_window"
+        app:summary="@string/third_window_summary"
+        app:title="@string/third_window_title" />
+    <com.amaze.filemanager.ui.views.preference.CheckBox
+        app:defaultValue="false"
         app:key="fabDownloads"
         app:summaryOff="@string/fab_button_home"
         app:summaryOn="@string/fab_button_downloads"

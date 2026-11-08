@@ -73,6 +73,7 @@ import com.amaze.filemanager.ui.activities.superclasses.PreferenceActivity;
 import com.amaze.filemanager.ui.colors.ColorUtils;
 import com.amaze.filemanager.ui.drag.RecyclerAdapterDragListener;
 import com.amaze.filemanager.ui.fragments.MainFragment;
+import com.amaze.filemanager.ui.fragments.TabFragment;
 import com.amaze.filemanager.ui.fragments.preferencefragments.PreferencesConstants;
 import com.amaze.filemanager.ui.icons.Icons;
 import com.amaze.filemanager.ui.icons.MimeTypes;
@@ -99,6 +100,8 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Handler;
+import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -781,11 +784,33 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     if (mainFragment.getMainFragmentViewModel().isList()) {
       bindViewHolderList(holder, position);
+      applyListTextSize(holder);
     } else {
       bindViewHolderGrid(holder, position);
     }
 
     invalidateActionMode();
+  }
+
+  /** smaller single line text so rows fit in half-width panes while side by side */
+  private void applyListTextSize(@NonNull ItemViewHolder holder) {
+    TabFragment tabFragment = mainFragment.getMainActivity().getTabFragment();
+    boolean compact = tabFragment != null && tabFragment.isSideBySide();
+    holder.txtTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, compact ? 13 : 17);
+    float smallSize = compact ? 10 : 13;
+    holder.date.setTextSize(TypedValue.COMPLEX_UNIT_SP, smallSize);
+    holder.txtDesc.setTextSize(TypedValue.COMPLEX_UNIT_SP, smallSize);
+    holder.perm.setTextSize(TypedValue.COMPLEX_UNIT_SP, smallSize);
+    if (!compact) return;
+
+    holder.txtTitle.setSingleLine(true);
+    holder.txtTitle.setEllipsize(TextUtils.TruncateAt.END);
+    holder.date.setSingleLine(true);
+    holder.txtDesc.setSingleLine(true);
+    // "Nov 8 | 01:54" becomes "Nov 8" so that the size still fits next to it
+    String date = holder.date.getText().toString();
+    int timeSeparator = date.indexOf(" |");
+    if (timeSeparator > 0) holder.date.setText(date.substring(0, timeSeparator));
   }
 
   private void applyLightSecondaryTextColor(@NonNull ItemViewHolder holder) {

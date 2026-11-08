@@ -107,6 +107,9 @@ object PreferencesConstants {
 
     // others
     const val PREFERENCE_CURRENT_TAB = ""
+    const val PREFERENCE_THIRD_WINDOW = "third_window"
+    const val PREFERENCE_SIDE_BY_SIDE_PORTRAIT = "side_by_side_portrait"
+    const val PREFERENCE_SIDE_BY_SIDE_LANDSCAPE = "side_by_side_landscape"
     const val PREFERENCE_BOOKMARKS_ADDED = "books_added"
     const val PREFERENCE_DIRECTORY_SORT_MODE = "dirontop"
     const val PREFERENCE_DRAWER_HEADER_PATH = "drawer_header_path"

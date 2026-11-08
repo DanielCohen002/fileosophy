@@ -546,6 +546,12 @@ public class Indicator extends View implements View.OnAttachStateChangeListener 
   private void setSelectedPage(int now) {
     if (now == currentPage) return;
 
+    // not measured yet, so there is nothing to animate
+    if (dotCenterX == null || joiningFractions == null || dotRevealFractions == null) {
+      currentPage = now;
+      return;
+    }
+
     pageChanging = true;
     previousPage = currentPage;
     currentPage = now;

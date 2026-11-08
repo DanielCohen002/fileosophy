@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
     -->
-<androidx.constraintlayout.widget.ConstraintLayout
+<com.amaze.filemanager.ui.views.PaneTouchLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -40,6 +40,50 @@
             android:elevation="7dp"
             android:paddingTop="4dp" />-->
     </androidx.viewpager2.widget.ViewPager2>
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/pane_split"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+    <FrameLayout
+        android:id="@+id/pane_handle"
+        android:layout_width="28dp"
+        android:layout_height="@dimen/zero_dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="@id/pane_split"
+        app:layout_constraintRight_toRightOf="@id/pane_split">
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:background="#44808080" />
+        <View
+            android:layout_width="6dp"
+            android:layout_height="56dp"
+            android:layout_gravity="center"
+            android:background="@drawable/pane_handle_pill" />
+    </FrameLayout>
+    <View
+        android:id="@+id/pane_marker_left"
+        android:layout_width="@dimen/zero_dp"
+        android:layout_height="3dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="@id/pane_split"
+        />
+    <View
+        android:id="@+id/pane_marker_right"
+        android:layout_width="@dimen/zero_dp"
+        android:layout_height="3dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="@id/pane_split"
+        app:layout_constraintRight_toRightOf="parent"
+        />
     <View
         android:id="@+id/placeholder_drag_left"
         android:layout_width="@dimen/material_generic_medium"
@@ -80,4 +124,4 @@
         app:layout_constraintTop_toBottomOf="parent"
         android:layout_margin="@dimen/material_generic_large"
         />
-</androidx.constraintlayout.widget.ConstraintLayout>
+</com.amaze.filemanager.ui.views.PaneTouchLayout>

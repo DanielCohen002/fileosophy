@@ -24,6 +24,11 @@
         android:title="@string/search"
         android:icon="@drawable/ic_search_white_24dp"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/side_by_side"
+        android:title="@string/side_by_side"
+        android:icon="@drawable/ic_side_by_side_white_24dp"
+        app:showAsAction="always" />
     <item android:id="@+id/home"
         android:title="@string/home"
         android:visible="false"

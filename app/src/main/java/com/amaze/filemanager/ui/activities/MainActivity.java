@@ -1156,6 +1156,7 @@ public class MainActivity extends PermissionsActivity
     MenuItem s = menu.findItem(R.id.view);
     MenuItem search = menu.findItem(R.id.search);
     Fragment fragment = getFragmentAtFrame();
+    menu.findItem(R.id.side_by_side).setVisible(fragment instanceof TabFragment);
     if (fragment instanceof TabFragment) {
       appbar.setTitle(R.string.appbar_name);
       if (getBoolean(PREFERENCE_VIEW)) {
@@ -1260,6 +1261,12 @@ public class MainActivity extends PermissionsActivity
     // Same thing goes to other Fragments loaded.
     // If they have handled the options, we don't need to.
     if (getFragmentAtFrame().onOptionsItemSelected(item)) return true;
+
+    if (item.getItemId() == R.id.side_by_side) {
+      TabFragment tabFragment = getTabFragment();
+      if (tabFragment != null) tabFragment.toggleSideBySide();
+      return true;
+    }
 
     // Handle action buttons
     executeWithMainFragment(
