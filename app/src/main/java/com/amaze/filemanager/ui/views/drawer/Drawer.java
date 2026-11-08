@@ -223,10 +223,6 @@ public class Drawer implements NavigationView.OnNavigationItemSelectedListener {
     // skin)));
     drawerHeaderView.setBackgroundResource(R.drawable.leather_header);
     // drawerHeaderParent.setBackgroundColor(Color.parseColor((currentTab==1 ? skinTwo : skin)));
-    if (mainActivity.findViewById(R.id.tab_frame) != null) {
-      isOnTablet = true;
-      mDrawerLayout.setScrimColor(Color.TRANSPARENT);
-    }
     navView.addHeaderView(drawerHeaderLayout);
 
     if (!isOnTablet) {
@@ -266,15 +262,8 @@ public class Drawer implements NavigationView.OnNavigationItemSelectedListener {
 
   /** Refactors lock mode based on orientation */
   public void refactorDrawerLockMode() {
-    if (mainActivity.findViewById(R.id.tab_frame) != null) {
-      isOnTablet = true;
-      mDrawerLayout.setScrimColor(Color.TRANSPARENT);
-      open();
-      lock(DrawerLayout.LOCK_MODE_LOCKED_OPEN);
-    } else {
-      unlockIfNotOnTablet();
-      close();
-    }
+    unlockIfNotOnTablet();
+    close();
   }
 
   public void refreshDrawer() {

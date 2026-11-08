@@ -180,8 +180,7 @@ public class ThemedActivity extends PreferenceActivity {
     Window window = getWindow();
     if (SDK_INT >= LOLLIPOP) {
       boolean useSolidStatusBar =
-          findViewById(R.id.tab_frame) != null
-              || findViewById(R.id.drawer_layout) == null
+          findViewById(R.id.drawer_layout) == null
               || getAppTheme().equals(AppTheme.LIGHT);
 
       if (useSolidStatusBar) {
