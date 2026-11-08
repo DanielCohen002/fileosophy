@@ -61,6 +61,7 @@ import com.amaze.filemanager.utils.DataUtils;
 import com.amaze.filemanager.utils.OTGUtil;
 import com.amaze.filemanager.utils.ScreenUtils;
 import com.amaze.filemanager.utils.TinyDB;
+import com.amaze.filemanager.utils.UpdateChecker;
 import com.amaze.filemanager.utils.Utils;
 import com.cloudrail.si.interfaces.CloudStorage;
 import com.cloudrail.si.services.Box;
@@ -513,6 +514,15 @@ public class Drawer implements NavigationView.OnNavigationItemSelectedListener {
         R.string.trash_bin,
         new MenuMetadata("7", true),
         R.drawable.round_delete_outline_24,
+        null);
+
+    addNewItem(
+        menu,
+        LASTGROUP,
+        order++,
+        R.string.update_check,
+        new MenuMetadata(() -> UpdateChecker.INSTANCE.checkForUpdate(mainActivity)),
+        R.drawable.ic_system_update_white_24dp,
         null);
 
     addNewItem(

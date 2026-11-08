@@ -144,6 +144,7 @@ import com.amaze.filemanager.utils.MainActivityActionMode;
 import com.amaze.filemanager.utils.MainActivityHelper;
 import com.amaze.filemanager.utils.OTGUtil;
 import com.amaze.filemanager.utils.PreferenceUtils;
+import com.amaze.filemanager.utils.UpdateChecker;
 import com.amaze.filemanager.utils.Utils;
 import com.cloudrail.si.CloudRail;
 import com.google.android.material.appbar.AppBarLayout;
@@ -469,6 +470,10 @@ public class MainActivity extends PermissionsActivity
         || Intent.ACTION_SEND.equals(actionIntent)
         || Intent.ACTION_SEND_MULTIPLE.equals(actionIntent)) {
       checkForExternalPermission();
+    }
+
+    if (savedInstanceState == null) {
+      getWindow().getDecorView().post(() -> UpdateChecker.showChangelogIfUpdated(this));
     }
 
     Completable.fromRunnable(
