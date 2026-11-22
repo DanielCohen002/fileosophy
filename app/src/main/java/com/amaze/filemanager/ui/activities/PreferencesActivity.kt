@@ -24,12 +24,15 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import androidx.activity.OnBackPressedCallback
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.ActionBar
+import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.FragmentTransaction
 import androidx.fragment.app.commit
@@ -41,6 +44,7 @@ import com.amaze.filemanager.ui.fragments.preferencefragments.BasePrefsFragment
 import com.amaze.filemanager.ui.fragments.preferencefragments.BehaviorPrefsFragment
 import com.amaze.filemanager.ui.fragments.preferencefragments.PreferencesConstants
 import com.amaze.filemanager.ui.fragments.preferencefragments.PrefsFragment
+import com.amaze.filemanager.ui.fragments.preferencefragments.SettingsSearchFragment
 import com.amaze.filemanager.ui.theme.AppTheme
 import com.amaze.filemanager.utils.PreferenceUtils
 import com.amaze.filemanager.utils.Utils
@@ -97,6 +101,66 @@ class PreferencesActivity : ThemedActivity(), FolderChooserDialog.FolderCallback
                 pushFragment(BehaviorPrefsFragment())
             }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.preferences_menu, menu)
+
+        val searchItem = menu.findItem(R.id.search_settings)
+        val searchView = searchItem.actionView as SearchView
+        searchView.queryHint = getString(R.string.settings_search_hint)
+        searchView.setOnQueryTextListener(
+            object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    hideKeyboard()
+                    return true
+                }
+
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    showSearchResults(newText.orEmpty())
+                    return true
+                }
+            },
+        )
+        searchItem.setOnActionExpandListener(
+            object : MenuItem.OnActionExpandListener {
+                override fun onMenuItemActionExpand(item: MenuItem) = true
+
+                override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
+                    closeSearchResults()
+                    return true
+                }
+            },
+        )
+        return true
+    }
+
+    private fun currentSearchFragment() =
+        supportFragmentManager.findFragmentById(R.id.preferences_container) as? SettingsSearchFragment
+
+    private fun showSearchResults(query: String) {
+        val searchFragment = currentSearchFragment()
+        if (searchFragment != null) {
+            searchFragment.updateQuery(query)
+        } else if (query.isNotEmpty()) {
+            pushFragment(
+                SettingsSearchFragment().apply {
+                    arguments = Bundle().apply { putString(SettingsSearchFragment.ARG_QUERY, query) }
+                },
+            )
+        }
+    }
+
+    private fun closeSearchResults() {
+        if (currentSearchFragment() != null) {
+            supportFragmentManager.popBackStack()
+        }
+    }
+
+    fun hideKeyboard() {
+        val focus = currentFocus ?: return
+        getSystemService(InputMethodManager::class.java)
+            .hideSoftInputFromWindow(focus.windowToken, 0)
     }
 
     override fun onBackPressed() {

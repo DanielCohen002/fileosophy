@@ -475,6 +475,11 @@
     <string name="moved">moved</string>
     <string name="copy_complete">Copy Complete</string>
     <string name="move_complete">Move Complete</string>
+    <string name="settings_search_hint">Search settings</string>
+    <string name="settings_search_prompt">Type the name of a setting</string>
+    <string name="settings_search_no_results">No settings found</string>
+    <!-- %s is the name of the settings screen the setting is on -->
+    <string name="settings_search_location">In %s</string>
     <string name="eject_storage_in_settings">Tap the eject icon next to %s</string>
     <string name="eject_storage_safe_to_remove">%s ejected, it is now safe to remove</string>
     <string name="eject_storage_failed">Could not eject %s</string>

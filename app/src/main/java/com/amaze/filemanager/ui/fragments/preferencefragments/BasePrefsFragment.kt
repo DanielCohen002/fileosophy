@@ -20,6 +20,8 @@
 
 package com.amaze.filemanager.ui.fragments.preferencefragments
 
+import android.os.Bundle
+import android.view.View
 import androidx.preference.PreferenceFragmentCompat
 import com.afollestad.materialdialogs.folderselector.FolderChooserDialog
 import com.amaze.filemanager.ui.activities.PreferencesActivity
@@ -30,6 +32,19 @@ abstract class BasePrefsFragment : PreferenceFragmentCompat(), FolderChooserDial
         get() = requireActivity() as PreferencesActivity
 
     abstract val title: Int
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Opened from a settings search result: bring the setting into view
+        val key = arguments?.getString(ARG_SCROLL_TO_KEY)
+        if (savedInstanceState == null && key != null) {
+            view.post { scrollToPreference(key) }
+        }
+    }
 
     override fun onResume() {
         super.onResume()
@@ -46,5 +61,9 @@ abstract class BasePrefsFragment : PreferenceFragmentCompat(), FolderChooserDial
 
     override fun onFolderChooserDismissed(dialog: FolderChooserDialog) {
         dialog.dismiss()
+    }
+
+    companion object {
+        const val ARG_SCROLL_TO_KEY = "scrollToKey"
     }
 }
