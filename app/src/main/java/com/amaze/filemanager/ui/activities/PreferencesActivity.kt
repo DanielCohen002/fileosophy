@@ -38,6 +38,7 @@ import com.amaze.filemanager.R
 import com.amaze.filemanager.ui.activities.superclasses.ThemedActivity
 import com.amaze.filemanager.ui.colors.ColorPreferenceHelper
 import com.amaze.filemanager.ui.fragments.preferencefragments.BasePrefsFragment
+import com.amaze.filemanager.ui.fragments.preferencefragments.BehaviorPrefsFragment
 import com.amaze.filemanager.ui.fragments.preferencefragments.PreferencesConstants
 import com.amaze.filemanager.ui.fragments.preferencefragments.PrefsFragment
 import com.amaze.filemanager.ui.theme.AppTheme
@@ -47,8 +48,11 @@ import com.readystatesoftware.systembartint.SystemBarTintManager
 import java.io.File
 
 class PreferencesActivity : ThemedActivity(), FolderChooserDialog.FolderCallback {
-    private companion object {
-        const val SAVED_INSTANCE_STATE_KEY = "savedInstanceState"
+    companion object {
+        private const val SAVED_INSTANCE_STATE_KEY = "savedInstanceState"
+
+        /** Intent extra to open the Behavior screen straight away. */
+        const val EXTRA_OPEN_BEHAVIOR_PREFS = "openBehaviorPrefs"
     }
 
     lateinit var layout: View
@@ -88,6 +92,10 @@ class PreferencesActivity : ThemedActivity(), FolderChooserDialog.FolderCallback
                 .beginTransaction()
                 .replace(R.id.preferences_container, fragment)
                 .commit()
+
+            if (intent.getBooleanExtra(EXTRA_OPEN_BEHAVIOR_PREFS, false)) {
+                pushFragment(BehaviorPrefsFragment())
+            }
         }
     }
 

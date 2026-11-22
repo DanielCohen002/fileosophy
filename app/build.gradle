@@ -147,6 +147,8 @@ dependencies {
     implementation libs.androidX.fragment
     implementation libs.androidX.appcompat
     implementation libs.androidX.preference
+    implementation libs.shizuku.api
+    implementation libs.shizuku.provider
     implementation libs.androidX.core
     implementation libs.androidX.palette
     implementation libs.androidX.cardview

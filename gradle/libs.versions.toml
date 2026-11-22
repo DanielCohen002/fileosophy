@@ -27,6 +27,7 @@ androidXFragment = "1.8.9"
 androidXAppCompat = "1.7.1"
 androidXAnnotation = "1.10.0"
 androidXPref = "1.2.1"
+shizuku = "13.1.5"
 androidXPalette = "1.0.0"
 androidXCardView = "1.0.0"
 androidXConstraintLayout = "2.2.2"
@@ -96,6 +97,8 @@ androidX-legacySupportV13 = { module = "androidx.legacy:legacy-support-v13", ver
 androidX-annotation = { module = "androidx.annotation:annotation", version.ref = "androidXAnnotation" }
 androidX-multidex = { module = "androidx.multidex:multidex", version.ref = "androidXMultidex" }
 androidX-palette = { module = "androidx.palette:palette-ktx", version.ref = "androidXPalette" }
+shizuku-api = { module = "dev.rikka.shizuku:api", version.ref = "shizuku" }
+shizuku-provider = { module = "dev.rikka.shizuku:provider", version.ref = "shizuku" }
 androidX-preference = { module = "androidx.preference:preference-ktx", version.ref = "androidXPref" }
 androidX-vectordrawable-animated = { module = "androidx.vectordrawable:vectordrawable-animated", version.ref = "vectordrawableAnimated" }
 androidX-biometric = { module = "androidx.biometric:biometric", version.ref = "androidXBiometric" }

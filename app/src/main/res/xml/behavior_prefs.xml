@@ -100,6 +100,10 @@
             app:title="@string/match_content" />
     </PreferenceCategory>
     <PreferenceCategory app:title="@string/advanced">
+        <Preference
+            app:key="shizuku_setup"
+            app:summary="@string/shizuku_setup_summary_not_installed"
+            app:title="@string/shizuku_setup_title" />
         <com.amaze.filemanager.ui.views.preference.CheckBox
             app:defaultValue="false"
             app:key="legacyListing"

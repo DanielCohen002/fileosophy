@@ -44,6 +44,7 @@ import com.amaze.filemanager.fileoperations.filesystem.OpenMode;
 import com.amaze.filemanager.fileoperations.filesystem.usb.SingletonUsbOtg;
 import com.amaze.filemanager.filesystem.HybridFile;
 import com.amaze.filemanager.filesystem.RootHelper;
+import com.amaze.filemanager.filesystem.ShizukuStorageEjector;
 import com.amaze.filemanager.filesystem.cloud.CloudUtil;
 import com.amaze.filemanager.filesystem.files.FileUtils;
 import com.amaze.filemanager.ui.ExtensionsKt;
@@ -819,22 +820,74 @@ public class Drawer implements NavigationView.OnNavigationItemSelectedListener {
     return false;
   }
 
+  private String getStorageName(@NonNull String path) {
+    for (StorageDirectoryParcelable storageDirectory : mainActivity.getStorageDirectories()) {
+      if (storageDirectory.path.equals(path)) {
+        return storageDirectory.name;
+      }
+    }
+    return "OTG";
+  }
+
   /**
-   * Android gives apps no way to unmount a volume themselves, so release everything this app holds
-   * on the storage (open window, USB OTG root) and hand over to the system storage settings, which
-   * offer the actual eject.
+   * Android gives apps no way to unmount a volume themselves. With Shizuku set up it is done
+   * here in one tap, otherwise the user is told how to finish in the system storage settings.
+   * Either way everything this app holds on the storage (open window, USB OTG root) is released
+   * first.
    */
   private void ejectStorage(@NonNull String path) {
+    String name = getStorageName(path);
     mainActivity.releaseRemovableStorage(path);
     refreshDrawer();
 
-    Intent storageSettings = new Intent(Settings.ACTION_INTERNAL_STORAGE_SETTINGS);
-    if (storageSettings.resolveActivity(mainActivity.getPackageManager()) != null) {
-      mainActivity.startActivity(storageSettings);
-      AppConfig.toast(mainActivity, R.string.eject_storage_in_settings);
+    if (ShizukuStorageEjector.getState(mainActivity) == ShizukuStorageEjector.State.READY) {
+      ShizukuStorageEjector.unmountAsync(
+          mainActivity,
+          path,
+          success ->
+              mainActivity.runOnUiThread(
+                  () -> {
+                    if (success) {
+                      AppConfig.toast(
+                          mainActivity, mainActivity.getString(R.string.eject_storage_safe_to_remove, name));
+                      refreshDrawer();
+                    } else {
+                      AppConfig.toast(
+                          mainActivity, mainActivity.getString(R.string.eject_storage_failed, name));
+                      showEjectHelpDialog(name);
+                    }
+                  }));
     } else {
-      AppConfig.toast(mainActivity, R.string.eject_storage_safe_to_remove);
+      showEjectHelpDialog(name);
     }
+  }
+
+  private void showEjectHelpDialog(@NonNull String name) {
+    new MaterialDialog.Builder(mainActivity)
+        .title(mainActivity.getString(R.string.eject_storage_dialog_title, name))
+        .content(mainActivity.getString(R.string.eject_storage_dialog_content, name))
+        .theme(mainActivity.getAppTheme().getMaterialDialogTheme())
+        .positiveText(R.string.eject_storage_setup)
+        .neutralText(R.string.eject_storage_open_settings)
+        .negativeText(R.string.cancel)
+        .positiveColor(mainActivity.getAccent())
+        .neutralColor(mainActivity.getAccent())
+        .negativeColor(mainActivity.getAccent())
+        .onPositive(
+            (dialog, which) ->
+                mainActivity.startActivity(
+                    new Intent(mainActivity, PreferencesActivity.class)
+                        .putExtra(PreferencesActivity.EXTRA_OPEN_BEHAVIOR_PREFS, true)))
+        .onNeutral(
+            (dialog, which) -> {
+              Intent storageSettings = new Intent(Settings.ACTION_INTERNAL_STORAGE_SETTINGS);
+              if (storageSettings.resolveActivity(mainActivity.getPackageManager()) != null) {
+                mainActivity.startActivity(storageSettings);
+                AppConfig.toast(
+                    mainActivity, mainActivity.getString(R.string.eject_storage_in_settings, name));
+              }
+            })
+        .show();
   }
 
   public int getPhoneStorageCount() {

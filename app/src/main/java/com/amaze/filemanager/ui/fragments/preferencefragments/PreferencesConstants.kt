@@ -73,6 +73,7 @@ object PreferencesConstants {
     // behavior_prefs.xml
     const val PREFERENCE_ROOT_LEGACY_LISTING = "legacyListing"
     const val PREFERENCE_ROOTMODE = "rootmode"
+    const val PREFERENCE_SHIZUKU_SETUP = "shizuku_setup"
     const val PREFERENCE_CHANGEPATHS = "typeablepaths"
     const val PREFERENCE_SAVED_PATHS = "savepaths"
     const val PREFERENCE_ZIP_EXTRACT_PATH = "extractpath"

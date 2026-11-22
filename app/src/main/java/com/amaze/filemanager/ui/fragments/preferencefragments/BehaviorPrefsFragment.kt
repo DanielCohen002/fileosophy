@@ -20,27 +20,108 @@
 
 package com.amaze.filemanager.ui.fragments.preferencefragments
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.text.InputType
+import androidx.annotation.StringRes
 import androidx.preference.Preference
 import androidx.preference.PreferenceManager
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.folderselector.FolderChooserDialog
 import com.amaze.filemanager.R
 import com.amaze.filemanager.application.AppConfig
+import com.amaze.filemanager.filesystem.ShizukuStorageEjector
 import com.amaze.filemanager.ui.dialogs.OpenFileDialogFragment.Companion.clearPreferences
 import com.amaze.trashbin.TrashBinConfig
+import rikka.shizuku.Shizuku
 import java.io.File
 
 class BehaviorPrefsFragment : BasePrefsFragment(), FolderChooserDialog.FolderCallback {
     override val title = R.string.behavior
+
+    private val shizukuPermissionListener =
+        Shizuku.OnRequestPermissionResultListener { _, _ -> refreshShizukuSummary() }
+
+    override fun onResume() {
+        super.onResume()
+        refreshShizukuSummary()
+    }
+
+    override fun onDestroy() {
+        ShizukuStorageEjector.removePermissionResultListener(shizukuPermissionListener)
+        super.onDestroy()
+    }
+
+    private fun refreshShizukuSummary() {
+        findPreference<Preference>(PreferencesConstants.PREFERENCE_SHIZUKU_SETUP)?.setSummary(
+            when (ShizukuStorageEjector.getState(activity)) {
+                ShizukuStorageEjector.State.UNSUPPORTED ->
+                    R.string.shizuku_setup_summary_unsupported
+                ShizukuStorageEjector.State.NOT_INSTALLED ->
+                    R.string.shizuku_setup_summary_not_installed
+                ShizukuStorageEjector.State.NOT_RUNNING ->
+                    R.string.shizuku_setup_summary_not_running
+                ShizukuStorageEjector.State.NO_PERMISSION ->
+                    R.string.shizuku_setup_summary_no_permission
+                ShizukuStorageEjector.State.READY -> R.string.shizuku_setup_summary_ready
+            },
+        )
+    }
+
+    private fun onShizukuSetupClicked() {
+        when (ShizukuStorageEjector.getState(activity)) {
+            ShizukuStorageEjector.State.UNSUPPORTED ->
+                AppConfig.toast(activity, getString(R.string.shizuku_setup_summary_unsupported))
+            ShizukuStorageEjector.State.NOT_INSTALLED ->
+                showShizukuDialog(R.string.shizuku_install_dialog_content, R.string.shizuku_install_get) {
+                    startActivity(
+                        Intent(Intent.ACTION_VIEW, Uri.parse(ShizukuStorageEjector.SHIZUKU_DOWNLOAD_URL)),
+                    )
+                }
+            ShizukuStorageEjector.State.NOT_RUNNING ->
+                showShizukuDialog(R.string.shizuku_start_dialog_content, R.string.shizuku_start_open) {
+                    activity.packageManager
+                        .getLaunchIntentForPackage(ShizukuStorageEjector.SHIZUKU_PACKAGE)
+                        ?.let { startActivity(it) }
+                }
+            ShizukuStorageEjector.State.NO_PERMISSION -> ShizukuStorageEjector.requestPermission()
+            ShizukuStorageEjector.State.READY ->
+                AppConfig.toast(activity, getString(R.string.shizuku_setup_summary_ready))
+        }
+    }
+
+    private fun showShizukuDialog(
+        @StringRes content: Int,
+        @StringRes positive: Int,
+        onPositive: () -> Unit,
+    ) {
+        MaterialDialog.Builder(activity)
+            .title(R.string.shizuku_setup_title)
+            .content(content)
+            .theme(activity.utilsProvider.appTheme.materialDialogTheme)
+            .positiveText(positive)
+            .negativeText(R.string.cancel)
+            .positiveColor(activity.accent)
+            .negativeColor(activity.accent)
+            .onPositive { _, _ -> onPositive() }
+            .show()
+    }
 
     override fun onCreatePreferences(
         savedInstanceState: Bundle?,
         rootKey: String?,
     ) {
         setPreferencesFromResource(R.xml.behavior_prefs, rootKey)
+
+        findPreference<Preference>(PreferencesConstants.PREFERENCE_SHIZUKU_SETUP)
+            ?.onPreferenceClickListener =
+            Preference.OnPreferenceClickListener {
+                onShizukuSetupClicked()
+                true
+            }
+        ShizukuStorageEjector.addPermissionResultListener(shizukuPermissionListener)
 
         findPreference<Preference>("clear_open_file")?.onPreferenceClickListener =
             Preference.OnPreferenceClickListener {
