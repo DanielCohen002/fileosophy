@@ -195,7 +195,8 @@ public class DeleteTask
            */
           if (!doDeletePermanently
               && !OpenMode.SMB.equals(file.getMode())
-              && !OpenMode.SFTP.equals(file.getMode())) {
+              && !OpenMode.SFTP.equals(file.getMode())
+              && file.canMoveToBin()) {
             return file.moveToBin(applicationContext);
           }
           return file.delete(applicationContext, rootMode);

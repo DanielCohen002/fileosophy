@@ -101,6 +101,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.text.TextUtils;
 import android.text.format.Formatter;
 import android.widget.Toast;
@@ -1596,20 +1597,41 @@ public class HybridFile {
     }
   }
 
-  public boolean moveToBin(Context context) {
-    List<TrashBinFile> trashBinFiles = Collections.singletonList(this.toTrashBinFile(context));
-    TrashBin trashBin = AppConfig.getInstance().getTrashBinInstance();
-    if (trashBin != null) {
-      trashBin.moveToBin(
-          trashBinFiles,
-          true,
-          (originalFilePath, trashBinDestination) -> {
-            File source = new File(originalFilePath);
-            File dest = new File(trashBinDestination);
-            return source.renameTo(dest);
-          });
+  /**
+   * The trash bin lives on the primary shared storage and files are moved into it by renaming, which
+   * cannot cross volumes. Files on removable storage therefore cannot be binned.
+   *
+   * @return true if this file is on the same volume as the trash bin
+   */
+  public boolean canMoveToBin() {
+    try {
+      String binVolume = Environment.getExternalStorageDirectory().getCanonicalPath();
+      String filePath = getFile().getCanonicalPath();
+      return filePath.equals(binVolume) || filePath.startsWith(binVolume + File.separator);
+    } catch (IOException e) {
+      LOG.warn("unable to resolve volume of file for trash bin", e);
+      return false;
     }
-    return true;
+  }
+
+  /** @return true only if the file was really moved into the trash bin */
+  public boolean moveToBin(Context context) {
+    TrashBin trashBin = AppConfig.getInstance().getTrashBinInstance();
+    if (trashBin == null) {
+      return false;
+    }
+    List<TrashBinFile> trashBinFiles = Collections.singletonList(this.toTrashBinFile(context));
+    AtomicBoolean moved = new AtomicBoolean(false);
+    trashBin.moveToBin(
+        trashBinFiles,
+        true,
+        (originalFilePath, trashBinDestination) -> {
+          File source = new File(originalFilePath);
+          File dest = new File(trashBinDestination);
+          moved.set(source.renameTo(dest));
+          return moved.get();
+        });
+    return moved.get();
   }
 
   /** Permanently deletes every file currently in the trash bin. */
