@@ -487,6 +487,11 @@
     <string name="eject_storage_dialog_content">Android does not let apps eject drives on their own. Set up Shizuku once for one-tap eject, or finish in the system storage settings by tapping the eject icon next to %s.</string>
     <string name="eject_storage_setup">Set up one-tap eject</string>
     <string name="eject_storage_open_settings">Storage settings</string>
+    <string name="eject_storage_confirm_title">Eject %s?</string>
+    <string name="eject_storage_confirm_content">Make sure nothing is being copied to or from it. Fileosophy will unmount it so you can safely remove it.</string>
+    <string name="eject_storage_confirm_action">Eject</string>
+    <string name="shizuku_eject_enabled_title">Use one-tap eject</string>
+    <string name="shizuku_eject_enabled_summary">When off, the eject button shows instructions instead of ejecting</string>
     <string name="shizuku_setup_title">One-tap eject (Shizuku)</string>
     <string name="shizuku_setup_summary_unsupported">One-tap eject needs Android 7.0 or newer</string>
     <string name="shizuku_setup_summary_not_installed">Shizuku is not installed. Tap to get it</string>

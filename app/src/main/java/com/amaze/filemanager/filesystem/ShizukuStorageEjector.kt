@@ -24,6 +24,8 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.storage.StorageManager
+import androidx.preference.PreferenceManager
+import com.amaze.filemanager.ui.fragments.preferencefragments.PreferencesConstants
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import rikka.shizuku.Shizuku
@@ -55,6 +57,12 @@ object ShizukuStorageEjector {
     /** The Shizuku API library needs Android 7.0 */
     @JvmStatic
     fun isSupported(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
+
+    /** Whether the one-tap eject switch in the settings is on, it is on by default. */
+    @JvmStatic
+    fun isEnabled(context: Context): Boolean =
+        PreferenceManager.getDefaultSharedPreferences(context)
+            .getBoolean(PreferencesConstants.PREFERENCE_SHIZUKU_EJECT_ENABLED, true)
 
     @JvmStatic
     fun getState(context: Context): State =

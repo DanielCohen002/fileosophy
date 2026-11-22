@@ -105,6 +105,11 @@
             app:summary="@string/shizuku_setup_summary_not_installed"
             app:title="@string/shizuku_setup_title" />
         <com.amaze.filemanager.ui.views.preference.CheckBox
+            app:defaultValue="true"
+            app:key="shizuku_eject_enabled"
+            app:summary="@string/shizuku_eject_enabled_summary"
+            app:title="@string/shizuku_eject_enabled_title" />
+        <com.amaze.filemanager.ui.views.preference.CheckBox
             app:defaultValue="false"
             app:key="legacyListing"
             app:summary="@string/legacy_listing_summary"

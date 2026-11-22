@@ -830,36 +830,54 @@ public class Drawer implements NavigationView.OnNavigationItemSelectedListener {
   }
 
   /**
-   * Android gives apps no way to unmount a volume themselves. With Shizuku set up it is done
-   * here in one tap, otherwise the user is told how to finish in the system storage settings.
-   * Either way everything this app holds on the storage (open window, USB OTG root) is released
-   * first.
+   * Android gives apps no way to unmount a volume themselves. With Shizuku set up and one-tap
+   * eject switched on it is done here after asking for confirmation, otherwise the user is told
+   * how to finish in the system storage settings. Either way everything this app holds on the
+   * storage (open window, USB OTG root) is released first.
    */
   private void ejectStorage(@NonNull String path) {
     String name = getStorageName(path);
+
+    if (ShizukuStorageEjector.isEnabled(mainActivity)
+        && ShizukuStorageEjector.getState(mainActivity) == ShizukuStorageEjector.State.READY) {
+      new MaterialDialog.Builder(mainActivity)
+          .title(mainActivity.getString(R.string.eject_storage_confirm_title, name))
+          .content(R.string.eject_storage_confirm_content)
+          .theme(mainActivity.getAppTheme().getMaterialDialogTheme())
+          .positiveText(R.string.eject_storage_confirm_action)
+          .negativeText(R.string.cancel)
+          .positiveColor(mainActivity.getAccent())
+          .negativeColor(mainActivity.getAccent())
+          .onPositive((dialog, which) -> unmountWithShizuku(path, name))
+          .show();
+    } else {
+      mainActivity.releaseRemovableStorage(path);
+      refreshDrawer();
+      showEjectHelpDialog(name);
+    }
+  }
+
+  private void unmountWithShizuku(@NonNull String path, @NonNull String name) {
     mainActivity.releaseRemovableStorage(path);
     refreshDrawer();
 
-    if (ShizukuStorageEjector.getState(mainActivity) == ShizukuStorageEjector.State.READY) {
-      ShizukuStorageEjector.unmountAsync(
-          mainActivity,
-          path,
-          success ->
-              mainActivity.runOnUiThread(
-                  () -> {
-                    if (success) {
-                      AppConfig.toast(
-                          mainActivity, mainActivity.getString(R.string.eject_storage_safe_to_remove, name));
-                      refreshDrawer();
-                    } else {
-                      AppConfig.toast(
-                          mainActivity, mainActivity.getString(R.string.eject_storage_failed, name));
-                      showEjectHelpDialog(name);
-                    }
-                  }));
-    } else {
-      showEjectHelpDialog(name);
-    }
+    ShizukuStorageEjector.unmountAsync(
+        mainActivity,
+        path,
+        success ->
+            mainActivity.runOnUiThread(
+                () -> {
+                  if (success) {
+                    AppConfig.toast(
+                        mainActivity,
+                        mainActivity.getString(R.string.eject_storage_safe_to_remove, name));
+                    refreshDrawer();
+                  } else {
+                    AppConfig.toast(
+                        mainActivity, mainActivity.getString(R.string.eject_storage_failed, name));
+                    showEjectHelpDialog(name);
+                  }
+                }));
   }
 
   private void showEjectHelpDialog(@NonNull String name) {
