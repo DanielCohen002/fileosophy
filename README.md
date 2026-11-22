@@ -2,7 +2,8 @@
 
 # Fileosophy
 
-A personal, trimmed-down file manager for Android with a leather look. Fileosophy is a fork of
+A personal, trimmed-down file manager for Android with a leather look. Get it from the
+[Releases page](https://github.com/DanielCohen002/fileosophy/releases). Fileosophy is a fork of
 [Amaze File Manager](https://github.com/TeamAmaze/AmazeFileManager), cut down to the parts I
 actually use.
 
