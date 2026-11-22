@@ -21,6 +21,7 @@
 package com.amaze.filemanager.ui.fragments.preferencefragments
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -28,6 +29,7 @@ import android.text.InputType
 import androidx.annotation.StringRes
 import androidx.preference.Preference
 import androidx.preference.PreferenceManager
+import androidx.preference.SwitchPreference
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.folderselector.FolderChooserDialog
 import com.amaze.filemanager.R
@@ -42,7 +44,15 @@ class BehaviorPrefsFragment : BasePrefsFragment(), FolderChooserDialog.FolderCal
     override val title = R.string.behavior
 
     private val shizukuPermissionListener =
-        Shizuku.OnRequestPermissionResultListener { _, _ -> refreshShizukuSummary() }
+        Shizuku.OnRequestPermissionResultListener { _, grantResult ->
+            if (grantResult == PackageManager.PERMISSION_GRANTED) {
+                shizukuSwitch()?.isChecked = true
+            }
+            refreshShizukuSummary()
+        }
+
+    private fun shizukuSwitch() =
+        findPreference<SwitchPreference>(PreferencesConstants.PREFERENCE_SHIZUKU_EJECT_ENABLED)
 
     override fun onResume() {
         super.onResume()
@@ -55,7 +65,8 @@ class BehaviorPrefsFragment : BasePrefsFragment(), FolderChooserDialog.FolderCal
     }
 
     private fun refreshShizukuSummary() {
-        findPreference<Preference>(PreferencesConstants.PREFERENCE_SHIZUKU_SETUP)?.setSummary(
+        val switch = shizukuSwitch() ?: return
+        switch.setSummary(
             when (ShizukuStorageEjector.getState(activity)) {
                 ShizukuStorageEjector.State.UNSUPPORTED ->
                     R.string.shizuku_setup_summary_unsupported
@@ -65,7 +76,12 @@ class BehaviorPrefsFragment : BasePrefsFragment(), FolderChooserDialog.FolderCal
                     R.string.shizuku_setup_summary_not_running
                 ShizukuStorageEjector.State.NO_PERMISSION ->
                     R.string.shizuku_setup_summary_no_permission
-                ShizukuStorageEjector.State.READY -> R.string.shizuku_setup_summary_ready
+                ShizukuStorageEjector.State.READY ->
+                    if (switch.isChecked) {
+                        R.string.shizuku_setup_summary_ready
+                    } else {
+                        R.string.shizuku_setup_summary_off
+                    }
             },
         )
     }
@@ -87,9 +103,21 @@ class BehaviorPrefsFragment : BasePrefsFragment(), FolderChooserDialog.FolderCal
                         ?.let { startActivity(it) }
                 }
             ShizukuStorageEjector.State.NO_PERMISSION -> ShizukuStorageEjector.requestPermission()
-            ShizukuStorageEjector.State.READY ->
-                AppConfig.toast(activity, getString(R.string.shizuku_setup_summary_ready))
+            ShizukuStorageEjector.State.READY -> Unit
         }
+    }
+
+    /**
+     * Turning the switch on is only possible once Shizuku is ready, until then it walks through
+     * the missing step instead and the switch stays off.
+     */
+    private fun onShizukuSwitchChanged(turnedOn: Boolean): Boolean {
+        view?.post { refreshShizukuSummary() }
+        if (!turnedOn || ShizukuStorageEjector.getState(activity) == ShizukuStorageEjector.State.READY) {
+            return true
+        }
+        onShizukuSetupClicked()
+        return false
     }
 
     private fun showShizukuDialog(
@@ -115,11 +143,9 @@ class BehaviorPrefsFragment : BasePrefsFragment(), FolderChooserDialog.FolderCal
     ) {
         setPreferencesFromResource(R.xml.behavior_prefs, rootKey)
 
-        findPreference<Preference>(PreferencesConstants.PREFERENCE_SHIZUKU_SETUP)
-            ?.onPreferenceClickListener =
-            Preference.OnPreferenceClickListener {
-                onShizukuSetupClicked()
-                true
+        shizukuSwitch()?.onPreferenceChangeListener =
+            Preference.OnPreferenceChangeListener { _, newValue ->
+                onShizukuSwitchChanged(newValue as Boolean)
             }
         ShizukuStorageEjector.addPermissionResultListener(shizukuPermissionListener)
 

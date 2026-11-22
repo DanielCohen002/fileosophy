@@ -58,11 +58,11 @@ object ShizukuStorageEjector {
     @JvmStatic
     fun isSupported(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N
 
-    /** Whether the one-tap eject switch in the settings is on, it is on by default. */
+    /** Whether the user turned the one-tap eject switch on in the settings. */
     @JvmStatic
     fun isEnabled(context: Context): Boolean =
         PreferenceManager.getDefaultSharedPreferences(context)
-            .getBoolean(PreferencesConstants.PREFERENCE_SHIZUKU_EJECT_ENABLED, true)
+            .getBoolean(PreferencesConstants.PREFERENCE_SHIZUKU_EJECT_ENABLED, false)
 
     @JvmStatic
     fun getState(context: Context): State =

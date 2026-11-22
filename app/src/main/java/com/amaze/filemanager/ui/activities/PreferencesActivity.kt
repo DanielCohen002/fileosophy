@@ -98,7 +98,17 @@ class PreferencesActivity : ThemedActivity(), FolderChooserDialog.FolderCallback
                 .commit()
 
             if (intent.getBooleanExtra(EXTRA_OPEN_BEHAVIOR_PREFS, false)) {
-                pushFragment(BehaviorPrefsFragment())
+                pushFragment(
+                    BehaviorPrefsFragment().apply {
+                        arguments =
+                            Bundle().apply {
+                                putString(
+                                    BasePrefsFragment.ARG_SCROLL_TO_KEY,
+                                    PreferencesConstants.PREFERENCE_SHIZUKU_EJECT_ENABLED,
+                                )
+                            }
+                    },
+                )
             }
         }
     }
