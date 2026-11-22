@@ -116,14 +116,18 @@ echo "🔨 Found required NDK version: $NDK_VERSION"
 API_LEVEL=$(extract_api_level)
 echo "📋 Using API level: $API_LEVEL"
 
-# Set executable suffix for Windows
-EXE_SUFFIX=""
-if [ "$OS_PLATFORM" = "windows-x86_64" ]; then
-    EXE_SUFFIX=".exe"
-fi
-
 # Construct NDK path
 NDK_PATH="$ANDROID_SDK_PATH/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/$OS_PLATFORM/bin"
+
+# Recent NDKs ship the Windows clang wrappers as .cmd files, older ones as .exe
+EXE_SUFFIX=""
+if [ "$OS_PLATFORM" = "windows-x86_64" ]; then
+    if [ -f "$NDK_PATH/aarch64-linux-android${API_LEVEL}-clang.cmd" ]; then
+        EXE_SUFFIX=".cmd"
+    else
+        EXE_SUFFIX=".exe"
+    fi
+fi
 
 # Verify NDK path exists
 if [ ! -d "$NDK_PATH" ]; then
