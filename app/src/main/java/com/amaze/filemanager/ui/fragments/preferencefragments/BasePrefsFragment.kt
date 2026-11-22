@@ -20,9 +20,18 @@
 
 package com.amaze.filemanager.ui.fragments.preferencefragments
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ArgbEvaluator
+import android.animation.ValueAnimator
+import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import androidx.core.graphics.ColorUtils
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.PreferenceGroup
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.afollestad.materialdialogs.folderselector.FolderChooserDialog
 import com.amaze.filemanager.ui.activities.PreferencesActivity
 import java.io.File
@@ -39,11 +48,50 @@ abstract class BasePrefsFragment : PreferenceFragmentCompat(), FolderChooserDial
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Opened from a settings search result: bring the setting into view
+        // Opened from a settings search result: bring the setting into view and blink it
         val key = arguments?.getString(ARG_SCROLL_TO_KEY)
         if (savedInstanceState == null && key != null) {
-            view.post { scrollToPreference(key) }
+            view.post { scrollToAndBlink(key) }
         }
+    }
+
+    /** Scrolls the setting with [key] to the top of the list and blinks its row. */
+    private fun scrollToAndBlink(key: String) {
+        val position =
+            (listView.adapter as? PreferenceGroup.PreferencePositionCallback)
+                ?.getPreferenceAdapterPosition(key) ?: return
+        if (position == RecyclerView.NO_POSITION) return
+
+        (listView.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(position, 0)
+        // wait for the layout pass so the row view exists
+        listView.postDelayed(
+            {
+                if (!isAdded) return@postDelayed
+                val row =
+                    listView.findViewHolderForAdapterPosition(position)?.itemView
+                        ?: return@postDelayed
+                val originalBackground = row.background
+                ValueAnimator.ofObject(
+                    ArgbEvaluator(),
+                    Color.TRANSPARENT,
+                    ColorUtils.setAlphaComponent(activity.accent, BLINK_ALPHA),
+                ).apply {
+                    duration = BLINK_DURATION_MS
+                    repeatCount = BLINK_REPEAT_COUNT
+                    repeatMode = ValueAnimator.REVERSE
+                    addUpdateListener { row.setBackgroundColor(it.animatedValue as Int) }
+                    addListener(
+                        object : AnimatorListenerAdapter() {
+                            override fun onAnimationEnd(animation: Animator) {
+                                row.background = originalBackground
+                            }
+                        },
+                    )
+                    start()
+                }
+            },
+            BLINK_DELAY_MS,
+        )
     }
 
     override fun onResume() {
@@ -65,5 +113,11 @@ abstract class BasePrefsFragment : PreferenceFragmentCompat(), FolderChooserDial
 
     companion object {
         const val ARG_SCROLL_TO_KEY = "scrollToKey"
+
+        // same blink as the file list uses for a file it jumped to
+        private const val BLINK_ALPHA = 150
+        private const val BLINK_DURATION_MS = 180L
+        private const val BLINK_REPEAT_COUNT = 3
+        private const val BLINK_DELAY_MS = 200L
     }
 }
