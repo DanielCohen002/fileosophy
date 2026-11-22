@@ -1083,6 +1083,27 @@ public class MainActivity extends PermissionsActivity
   }
 
   /**
+   * Drops everything this app keeps open on a removable storage so it can be safely ejected: moves
+   * the current window off it and forgets the granted USB OTG root.
+   *
+   * @param storagePath root path of the storage about to be ejected
+   */
+  public void releaseRemovableStorage(@NonNull String storagePath) {
+    MainFragment mainFragment = getCurrentMainFragment();
+    if (mainFragment != null) {
+      String currentPath = mainFragment.getCurrentPath();
+      if (currentPath != null && currentPath.startsWith(storagePath)) {
+        mainFragment.loadlist(
+            getDrawer().getFirstPath(), false, OpenMode.FILE, true);
+      }
+    }
+    if (storagePath.contains(OTGUtil.PREFIX_OTG)
+        || storagePath.startsWith(OTGUtil.PREFIX_MEDIA_REMOVABLE)) {
+      SingletonUsbOtg.getInstance().resetUsbOtgRoot();
+    }
+  }
+
+  /**
    * Sets up the main view with a {@link MainFragment}
    *
    * @param path The path to which to go in the {@link MainFragment}

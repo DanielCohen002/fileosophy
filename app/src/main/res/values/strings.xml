@@ -475,6 +475,8 @@
     <string name="moved">moved</string>
     <string name="copy_complete">Copy Complete</string>
     <string name="move_complete">Move Complete</string>
+    <string name="eject_storage_in_settings">Tap Eject next to the storage in system settings</string>
+    <string name="eject_storage_safe_to_remove">Storage released, it is now safe to remove</string>
     <string name="waiting_title">Waiting</string>
     <string name="waiting_content">Waiting for operation to complete</string>
     <string name="extract_complete">Extraction complete</string>

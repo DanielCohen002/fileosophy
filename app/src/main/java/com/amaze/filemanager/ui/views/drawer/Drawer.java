@@ -75,6 +75,7 @@ import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Build;
+import android.provider.Settings;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.format.Formatter;
@@ -297,7 +298,7 @@ public class Drawer implements NavigationView.OnNavigationItemSelectedListener {
             "OTG",
             new MenuMetadata(file, false),
             R.drawable.ic_usb_white_24dp,
-            R.drawable.ic_show_chart_black_24dp,
+            R.drawable.ic_eject_black_24dp,
             Formatter.formatFileSize(mainActivity, freeSpace),
             Formatter.formatFileSize(mainActivity, totalSpace));
         continue;
@@ -311,7 +312,9 @@ public class Drawer implements NavigationView.OnNavigationItemSelectedListener {
             name,
             new MenuMetadata(file, false),
             icon,
-            R.drawable.ic_show_chart_black_24dp,
+            isRemovableStorageIcon(icon)
+                ? R.drawable.ic_eject_black_24dp
+                : R.drawable.ic_show_chart_black_24dp,
             Formatter.formatFileSize(mainActivity, freeSpace),
             Formatter.formatFileSize(mainActivity, totalSpace));
         if (phoneStorageCount == 0) firstPath = file;
@@ -763,7 +766,9 @@ public class Drawer implements NavigationView.OnNavigationItemSelectedListener {
 
     switch (item.getGroupId()) {
       case STORAGES_GROUP:
-        if (!path.equals("/")) {
+        if (isRemovableStoragePath(path)) {
+          ejectStorage(path);
+        } else if (!path.equals("/")) {
           GeneralDialogCreation.showPropertiesDialogForStorage(
               RootHelper.generateBaseFile(new File(path), true),
               mainActivity,
@@ -795,6 +800,40 @@ public class Drawer implements NavigationView.OnNavigationItemSelectedListener {
           GeneralDialogCreation.showCloudDialog(
               mainActivity, mainActivity.getAppTheme(), OpenMode.ONEDRIVE);
         }
+    }
+  }
+
+  private static boolean isRemovableStorageIcon(@DrawableRes int icon) {
+    return icon == R.drawable.ic_usb_white_24dp || icon == R.drawable.ic_sd_storage_white_24dp;
+  }
+
+  private boolean isRemovableStoragePath(@NonNull String path) {
+    if (path.contains(OTGUtil.PREFIX_OTG) || path.startsWith(OTGUtil.PREFIX_MEDIA_REMOVABLE)) {
+      return true;
+    }
+    for (StorageDirectoryParcelable storageDirectory : mainActivity.getStorageDirectories()) {
+      if (storageDirectory.path.equals(path)) {
+        return isRemovableStorageIcon(storageDirectory.iconRes);
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Android gives apps no way to unmount a volume themselves, so release everything this app holds
+   * on the storage (open window, USB OTG root) and hand over to the system storage settings, which
+   * offer the actual eject.
+   */
+  private void ejectStorage(@NonNull String path) {
+    mainActivity.releaseRemovableStorage(path);
+    refreshDrawer();
+
+    Intent storageSettings = new Intent(Settings.ACTION_INTERNAL_STORAGE_SETTINGS);
+    if (storageSettings.resolveActivity(mainActivity.getPackageManager()) != null) {
+      mainActivity.startActivity(storageSettings);
+      AppConfig.toast(mainActivity, R.string.eject_storage_in_settings);
+    } else {
+      AppConfig.toast(mainActivity, R.string.eject_storage_safe_to_remove);
     }
   }
 
