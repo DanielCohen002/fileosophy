@@ -480,13 +480,13 @@
     <string name="settings_search_no_results">No settings found</string>
     <!-- %s is the name of the settings screen the setting is on -->
     <string name="settings_search_location">In %s</string>
-    <string name="eject_storage_in_settings">Tap the eject icon next to %s</string>
+    <string name="eject_storage_in_settings">Tap the menu at the top right, then Eject</string>
     <string name="eject_storage_safe_to_remove">%s ejected, it is now safe to remove</string>
     <string name="eject_storage_failed">Could not eject %s</string>
     <string name="eject_storage_dialog_title">Eject %s</string>
-    <string name="eject_storage_dialog_content">Android does not let apps eject drives on their own. Quickest: pull down the notification shade and tap Eject on the notification for %s. Or open Storage settings and tap the eject icon next to it. Turning on one-tap eject (needs Shizuku) does it from here.</string>
+    <string name="eject_storage_dialog_content">Android does not let apps eject drives on their own. Tap Open drive page below, then the menu at the top right and choose Eject. You can also tap Eject on the notification for %s. Turning on one-tap eject (needs Shizuku) does it from here.</string>
     <string name="eject_storage_setup">Set up one-tap eject</string>
-    <string name="eject_storage_open_settings">Storage settings</string>
+    <string name="eject_storage_open_settings">Open drive page</string>
     <string name="eject_storage_confirm_title">Eject %s?</string>
     <string name="eject_storage_confirm_content">Make sure nothing is being copied to or from it. Fileosophy will unmount it so you can safely remove it.</string>
     <string name="eject_storage_confirm_action">Eject</string>

@@ -75,7 +75,10 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
+import android.os.storage.StorageManager;
+import android.os.storage.StorageVolume;
 import android.provider.Settings;
 import android.text.SpannableString;
 import android.text.TextUtils;
@@ -820,6 +823,10 @@ public class Drawer implements NavigationView.OnNavigationItemSelectedListener {
     return false;
   }
 
+  // DocumentsContract.ACTION_DOCUMENT_ROOT_SETTINGS needs API 26
+  private static final String ACTION_DOCUMENT_ROOT_SETTINGS =
+      "android.provider.action.DOCUMENT_ROOT_SETTINGS";
+
   private String getStorageName(@NonNull String path) {
     for (StorageDirectoryParcelable storageDirectory : mainActivity.getStorageDirectories()) {
       if (storageDirectory.path.equals(path)) {
@@ -853,7 +860,7 @@ public class Drawer implements NavigationView.OnNavigationItemSelectedListener {
     } else {
       mainActivity.releaseRemovableStorage(path);
       refreshDrawer();
-      showEjectHelpDialog(name);
+      showEjectHelpDialog(path, name);
     }
   }
 
@@ -875,12 +882,39 @@ public class Drawer implements NavigationView.OnNavigationItemSelectedListener {
                   } else {
                     AppConfig.toast(
                         mainActivity, mainActivity.getString(R.string.eject_storage_failed, name));
-                    showEjectHelpDialog(name);
+                    showEjectHelpDialog(path, name);
                   }
                 }));
   }
 
-  private void showEjectHelpDialog(@NonNull String name) {
+  /**
+   * Opens the system storage page of the drive at [path], which has Eject in its overflow menu.
+   * Falls back to the general storage settings when the drive has no volume uuid.
+   */
+  private Intent driveStorageSettingsIntent(@NonNull String path) {
+    String uuid = null;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+      StorageVolume volume =
+          mainActivity.getSystemService(StorageManager.class).getStorageVolume(new File(path));
+      if (volume != null) {
+        uuid = volume.getUuid();
+      }
+    }
+
+    if (uuid != null) {
+      Intent driveSettings =
+          new Intent(ACTION_DOCUMENT_ROOT_SETTINGS)
+              .setDataAndType(
+                  Uri.parse("content://com.android.externalstorage.documents/root/" + uuid),
+                  "vnd.android.document/root");
+      if (driveSettings.resolveActivity(mainActivity.getPackageManager()) != null) {
+        return driveSettings;
+      }
+    }
+    return new Intent(Settings.ACTION_INTERNAL_STORAGE_SETTINGS);
+  }
+
+  private void showEjectHelpDialog(@NonNull String path, @NonNull String name) {
     new MaterialDialog.Builder(mainActivity)
         .title(mainActivity.getString(R.string.eject_storage_dialog_title, name))
         .content(mainActivity.getString(R.string.eject_storage_dialog_content, name))
@@ -898,11 +932,10 @@ public class Drawer implements NavigationView.OnNavigationItemSelectedListener {
                         .putExtra(PreferencesActivity.EXTRA_OPEN_BEHAVIOR_PREFS, true)))
         .onNeutral(
             (dialog, which) -> {
-              Intent storageSettings = new Intent(Settings.ACTION_INTERNAL_STORAGE_SETTINGS);
+              Intent storageSettings = driveStorageSettingsIntent(path);
               if (storageSettings.resolveActivity(mainActivity.getPackageManager()) != null) {
                 mainActivity.startActivity(storageSettings);
-                AppConfig.toast(
-                    mainActivity, mainActivity.getString(R.string.eject_storage_in_settings, name));
+                AppConfig.toast(mainActivity, mainActivity.getString(R.string.eject_storage_in_settings));
               }
             })
         .show();
