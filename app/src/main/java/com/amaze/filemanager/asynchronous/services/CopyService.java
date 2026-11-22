@@ -235,12 +235,48 @@ public class CopyService extends AbstractProgressiveService {
     unregisterReceiver(cancelReceiver);
   }
 
+  /** Posts a dismissable notification telling the user the copy or move finished successfully. */
+  private void notifyTransferComplete(int itemCount, boolean move) {
+    Intent intent = new Intent(this, MainActivity.class);
+    intent.setAction(Intent.ACTION_MAIN);
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    PendingIntent pendingIntent =
+        PendingIntent.getActivity(this, 102, intent, getPendingIntentFlag(FLAG_UPDATE_CURRENT));
+
+    NotificationCompat.Builder builder =
+        new NotificationCompat.Builder(c, NotificationConstants.CHANNEL_NORMAL_ID)
+            .setSmallIcon(R.drawable.ic_content_copy_white_36dp)
+            .setContentTitle(getString(move ? R.string.move_complete : R.string.copy_complete))
+            .setContentText(
+                getString(
+                    R.string.paste_done_count,
+                    itemCount,
+                    getString(move ? R.string.moved : R.string.copied)))
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true);
+
+    NotificationConstants.setMetadata(c, builder, NotificationConstants.TYPE_NORMAL);
+
+    try {
+      getNotificationManager().notify(NotificationConstants.TRANSFER_COMPLETE_ID, builder.build());
+    } catch (SecurityException e) {
+      // notification permission denied by the user, the toast below is the fallback
+      LOG.warn("unable to post transfer complete notification", e);
+    }
+    Toast.makeText(
+            c,
+            getString(move ? R.string.move_complete : R.string.copy_complete),
+            Toast.LENGTH_SHORT)
+        .show();
+  }
+
   private class DoInBackground extends AsyncTask<Bundle, Void, Void> {
     boolean move;
     private Copy copy;
     private String targetPath;
     private final boolean isRootExplorer;
     private int sourceProgress = 0;
+    private int sourceCount = 0;
 
     private DoInBackground(boolean isRootExplorer) {
       this.isRootExplorer = isRootExplorer;
@@ -249,6 +285,7 @@ public class CopyService extends AbstractProgressiveService {
     protected Void doInBackground(Bundle... p1) {
 
       ArrayList<HybridFileParcelable> sourceFiles = p1[0].getParcelableArrayList(TAG_COPY_SOURCES);
+      sourceCount = sourceFiles.size();
 
       // setting up service watchers and initial data packages
       // finding total size on background thread (this is necessary condition for SMB!)
@@ -294,6 +331,9 @@ public class CopyService extends AbstractProgressiveService {
       // stopping watcher if not yet finished
       watcherUtil.stopWatch();
       finalizeNotification(copy.failedFOps, move);
+      if (copy.failedFOps.isEmpty()) {
+        notifyTransferComplete(sourceCount, move);
+      }
 
       Intent intent = new Intent(MainActivity.KEY_INTENT_LOAD_LIST);
       intent.putExtra(MainActivity.KEY_INTENT_LOAD_LIST_FILE, targetPath);

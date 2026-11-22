@@ -44,6 +44,7 @@ public class NotificationConstants {
   public static final int FTP_ID = 5;
   public static final int FAILED_ID = 6;
   public static final int WAIT_ID = 7;
+  public static final int TRANSFER_COMPLETE_ID = 8;
 
   public static final int TYPE_NORMAL = 0, TYPE_FTP = 1;
 
