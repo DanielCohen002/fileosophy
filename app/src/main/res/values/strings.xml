@@ -197,14 +197,9 @@
     <string name="update_check_failed">Could not check for updates. Check your connection and try again.</string>
     <string name="update_up_to_date">Fileosophy %1$s is the latest version</string>
     <string name="update_available">Version %1$s is available</string>
-    <string name="update_whats_new">What is new in %1$s</string>
     <string name="update_no_notes">No release notes.</string>
-    <string name="update_download_install">Download and install</string>
+    <string name="update_download">Download</string>
     <string name="update_later">Later</string>
-    <string name="update_ok">OK</string>
-    <string name="update_downloading">Downloading %1$s</string>
-    <string name="update_download_failed">The download failed (%1$s). Try again.</string>
-    <string name="update_allow_installs">Allow installs from Fileosophy, then tap Check for update again.</string>
     <string name="third_window_title">Third window</string>
     <string name="third_window_summary">Slide between three windows instead of two</string>
     <string name="back_summary">Enables custom back navigation at top of the list</string>

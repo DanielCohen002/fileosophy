@@ -22,32 +22,24 @@ package com.amaze.filemanager.utils
 
 import android.content.Intent
 import android.net.Uri
-import android.provider.Settings
 import android.widget.Toast
-import androidx.core.content.FileProvider
 import com.afollestad.materialdialogs.MaterialDialog
 import com.amaze.filemanager.BuildConfig
 import com.amaze.filemanager.R
 import com.amaze.filemanager.ui.activities.MainActivity
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
-import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
 
-/** Looks for a newer Fileosophy release on GitHub, downloads it and hands it to the installer. */
+/** Looks for a newer Fileosophy release on GitHub when asked, and opens its page. Never downloads or installs anything itself. */
 object UpdateChecker {
     private val log = LoggerFactory.getLogger(UpdateChecker::class.java)
 
     private const val LATEST_RELEASE_URL =
         "https://api.github.com/repos/DanielCohen002/fileosophy/releases/latest"
     private const val TIMEOUT_MS = 15_000
-    private const val APK_MIME_TYPE = "application/vnd.android.package-archive"
-    private const val UPDATES_DIRECTORY = "updates"
 
-    private const val PREFERENCE_CHANGELOG_SHOWN_VERSION = "update_changelog_shown_version"
-    private const val PREFERENCE_CHANGELOG_VERSION = "update_changelog_version"
-    private const val PREFERENCE_CHANGELOG_NOTES = "update_changelog_notes"
 
     private class Release(
         val version: String,
@@ -72,27 +64,6 @@ object UpdateChecker {
         }.start()
     }
 
-    /**
-     * Shows the notes of the release that was installed through [checkForUpdate], once, the first
-     * time the new version starts.
-     */
-    @JvmStatic
-    fun showChangelogIfUpdated(activity: MainActivity) {
-        val prefs = activity.prefs
-        val current = BuildConfig.VERSION_NAME
-        if (prefs.getString(PREFERENCE_CHANGELOG_VERSION, "") != current) return
-        if (prefs.getString(PREFERENCE_CHANGELOG_SHOWN_VERSION, "") == current) return
-        prefs.edit().putString(PREFERENCE_CHANGELOG_SHOWN_VERSION, current).apply()
-
-        val notes = prefs.getString(PREFERENCE_CHANGELOG_NOTES, "").orEmpty()
-        MaterialDialog.Builder(activity)
-            .theme(activity.appTheme.materialDialogTheme)
-            .title(activity.getString(R.string.update_whats_new, current))
-            .content(notes.ifBlank { activity.getString(R.string.update_no_notes) })
-            .positiveText(R.string.update_ok)
-            .show()
-    }
-
     private fun fetchLatestRelease(): Release {
         val connection = URL(LATEST_RELEASE_URL).openConnection() as HttpURLConnection
         try {
@@ -109,8 +80,8 @@ object UpdateChecker {
                 (0 until assets.length())
                     .map { assets.getJSONObject(it) }
                     .firstOrNull { it.getString("name").endsWith(".apk") }
-                    ?.getString("url")
-                    ?: throw IllegalStateException("release has no apk")
+                    ?.getString("browser_download_url")
+                    ?: json.getString("html_url")
             return Release(
                 json.getString("tag_name").removePrefix("v"),
                 json.optString("body"),
@@ -152,121 +123,14 @@ object UpdateChecker {
             .theme(activity.appTheme.materialDialogTheme)
             .title(activity.getString(R.string.update_available, release.version))
             .content(release.notes.ifBlank { activity.getString(R.string.update_no_notes) })
-            .positiveText(R.string.update_download_install)
+            .positiveText(R.string.update_download)
             .negativeText(R.string.update_later)
-            .onPositive { _, _ -> download(activity, release) }
-            .show()
-    }
-
-    private fun download(
-        activity: MainActivity,
-        release: Release,
-    ) {
-        if (!activity.packageManager.canRequestPackageInstalls()) {
-            // the user comes back and taps the button again once this is allowed
-            Toast.makeText(activity, R.string.update_allow_installs, Toast.LENGTH_LONG).show()
-            activity.startActivity(
-                Intent(
-                    Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
-                    Uri.parse("package:${activity.packageName}"),
-                ),
-            )
-            return
-        }
-
-        val progress =
-            MaterialDialog.Builder(activity)
-                .theme(activity.appTheme.materialDialogTheme)
-                .title(activity.getString(R.string.update_downloading, release.version))
-                .progress(false, 100)
-                .cancelable(false)
-                .show()
-        Thread {
-            val apk = runCatching { downloadApk(activity, release, progress) }
-            activity.runOnUiThread {
-                progress.dismiss()
-                if (activity.isFinishing || activity.isDestroyed) return@runOnUiThread
-                apk
-                    .onSuccess {
-                        rememberChangelog(activity, release)
-                        install(activity, it)
-                    }
-                    .onFailure {
-                        log.warn("failed to download update", it)
-                        Toast.makeText(
-                            activity,
-                            activity.getString(R.string.update_download_failed, it.message),
-                            Toast.LENGTH_LONG,
-                        ).show()
-                    }
-            }
-        }.start()
-    }
-
-    private fun rememberChangelog(
-        activity: MainActivity,
-        release: Release,
-    ) {
-        activity.prefs.edit()
-            .putString(PREFERENCE_CHANGELOG_VERSION, release.version)
-            .putString(PREFERENCE_CHANGELOG_NOTES, release.notes)
-            .apply()
-    }
-
-    private fun downloadApk(
-        activity: MainActivity,
-        release: Release,
-        progress: MaterialDialog,
-    ): File {
-        val directory = File(activity.getExternalFilesDir(null), UPDATES_DIRECTORY)
-        directory.deleteRecursively()
-        directory.mkdirs()
-        val target = File(directory, "fileosophy-${release.version}.apk")
-
-        val connection = URL(release.apkUrl).openConnection() as HttpURLConnection
-        try {
-            connection.connectTimeout = TIMEOUT_MS
-            connection.readTimeout = TIMEOUT_MS
-            connection.setRequestProperty("User-Agent", "Fileosophy")
-            // the asset address of the API, which hands out the file itself
-            connection.setRequestProperty("Accept", "application/octet-stream")
-            if (connection.responseCode != HttpURLConnection.HTTP_OK) {
-                throw IllegalStateException("download answered ${connection.responseCode}")
-            }
-            val total = connection.contentLengthLong
-            var received = 0L
-            connection.inputStream.use { input ->
-                target.outputStream().use { output ->
-                    val buffer = ByteArray(64 * 1024)
-                    while (true) {
-                        val read = input.read(buffer)
-                        if (read < 0) break
-                        output.write(buffer, 0, read)
-                        received += read
-                        if (total > 0) {
-                            activity.runOnUiThread {
-                                progress.setProgress((received * 100 / total).toInt())
-                            }
-                        }
-                    }
+            .onPositive { _, _ ->
+                try {
+                    activity.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(release.apkUrl)))
+                } catch (_: Exception) {
                 }
             }
-            if (total > 0 && received != total) throw IllegalStateException("download cut short")
-        } finally {
-            connection.disconnect()
-        }
-        return target
-    }
-
-    private fun install(
-        activity: MainActivity,
-        apk: File,
-    ) {
-        val uri = FileProvider.getUriForFile(activity, activity.packageName, apk)
-        activity.startActivity(
-            Intent(Intent.ACTION_VIEW)
-                .setDataAndType(uri, APK_MIME_TYPE)
-                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION),
-        )
+            .show()
     }
 }

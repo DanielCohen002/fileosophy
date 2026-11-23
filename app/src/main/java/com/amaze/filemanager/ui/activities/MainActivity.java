@@ -472,10 +472,6 @@ public class MainActivity extends PermissionsActivity
       checkForExternalPermission();
     }
 
-    if (savedInstanceState == null) {
-      getWindow().getDecorView().post(() -> UpdateChecker.showChangelogIfUpdated(this));
-    }
-
     Completable.fromRunnable(
             () -> {
               dataUtils.setHiddenFiles(utilsHandler.getHiddenFilesConcurrentRadixTree());
