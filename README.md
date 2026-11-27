@@ -1,11 +1,17 @@
-<p align="center"><img src="fileosophy-logo.svg" alt="Fileosophy logo" width="160"></p>
+<p align="center">
+  <img src="fileosophy-logo.svg" alt="Fileosophy logo" width="128" height="128">
+</p>
 
-# Fileosophy
+<h1 align="center">Fileosophy</h1>
 
-A personal, trimmed-down file manager for Android with a leather look. Get it from the
-[Releases page](https://github.com/DanielCohen002/fileosophy/releases). Fileosophy is a fork of
-[Amaze File Manager](https://github.com/TeamAmaze/AmazeFileManager), cut down to the parts I
-actually use.
+A personal, trimmed-down file manager for Android with a leather look.
+
+### [Download the latest signed APK](https://github.com/DanielCohen002/fileosophy/releases/latest)
+
+Package name `app.fileosophy.files`. Needs Android 6.0 or newer.
+
+> **Fileosophy is a fork of [Amaze File Manager](https://github.com/TeamAmaze/AmazeFileManager)** (GPL-3.0 or later),
+> cut down to the parts I actually use. Thanks to Team Amaze and its contributors.
 
 ## What's different from Amaze
 
@@ -26,7 +32,7 @@ actually use.
 - **Own identity.** Its own name, owl icon and application id (`app.fileosophy.files`), so it
   installs alongside Amaze.
 
-## Download
+## Install
 
 Get the latest `Fileosophy-<version>.apk` from the
 [Releases page](https://github.com/DanielCohen002/fileosophy/releases) and open it on your phone.
@@ -43,7 +49,7 @@ scanning** (or **Scan app**).
 Needs JDK 17+, the Android SDK, Rust with the Android targets (see `file_operations/`), and
 `python3` on the PATH. The APK ends up in `app/build/outputs/apk/fdroid/debug/`.
 
-## Credits and license
+## License
 
 Fileosophy is built on Amaze File Manager by Team Amaze and its contributors. Thank you to everyone
 who made it.
