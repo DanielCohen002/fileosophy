@@ -87,6 +87,8 @@ public class AppConfig extends GlideApplication {
   private TrashBinConfig trashBinConfig;
   private TrashBin trashBin;
   private static final String TRASH_BIN_BASE_PATH =
+      Environment.getExternalStorageDirectory().getPath() + File.separator + ".Fileosophy";
+  private static final String LEGACY_TRASH_BIN_BASE_PATH =
       Environment.getExternalStorageDirectory().getPath() + File.separator + ".AmazeData";
 
   public UtilitiesProvider getUtilsProvider() {
@@ -289,6 +291,7 @@ public class AppConfig extends GlideApplication {
 
   private TrashBinConfig getTrashBinConfig() {
     if (trashBinConfig == null) {
+      migrateLegacyTrashBin();
       SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
       int days =
@@ -312,6 +315,33 @@ public class AppConfig extends GlideApplication {
               TRASH_BIN_BASE_PATH, days, bytes, numOfFiles, intervalHours, false, true);
     }
     return trashBinConfig;
+  }
+
+  /**
+   * Older versions kept the trash in a hidden ".AmazeData" folder. Move it to ".Fileosophy" and fix
+   * the full paths the trash bin remembers, so files already in the trash can still be restored.
+   */
+  private static void migrateLegacyTrashBin() {
+    File legacy = new File(LEGACY_TRASH_BIN_BASE_PATH);
+    File current = new File(TRASH_BIN_BASE_PATH);
+    if (!legacy.isDirectory() || current.exists()) {
+      return;
+    }
+    if (!legacy.renameTo(current)) {
+      log.warn("could not move legacy trash bin folder {}", legacy);
+      return;
+    }
+    File meta = new File(current, "metadata.json");
+    if (meta.isFile()) {
+      try {
+        java.nio.file.Path metaPath = meta.toPath();
+        String json = new String(java.nio.file.Files.readAllBytes(metaPath), "UTF-8");
+        json = json.replace(LEGACY_TRASH_BIN_BASE_PATH, TRASH_BIN_BASE_PATH);
+        java.nio.file.Files.write(metaPath, json.getBytes("UTF-8"));
+      } catch (java.io.IOException e) {
+        log.warn("could not update legacy trash bin metadata", e);
+      }
+    }
   }
 
   public static String getTrashBinBasePath() {

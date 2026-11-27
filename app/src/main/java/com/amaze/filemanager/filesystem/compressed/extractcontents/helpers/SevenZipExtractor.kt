@@ -38,6 +38,8 @@ import org.tukaani.xz.CorruptedInputException
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.IOException
+import java.util.Collections
+import java.util.IdentityHashMap
 
 class SevenZipExtractor(
     context: Context,
@@ -72,30 +74,40 @@ class SevenZipExtractor(
                     throw BadArchiveNotice(it)
                 }
             }
-        val arrayList = ArrayList<SevenZArchiveEntry>()
+        try {
+            // identity set: archives with thousands of entries must not be compared one by one
+            val wanted: MutableSet<SevenZArchiveEntry> =
+                Collections.newSetFromMap(IdentityHashMap())
+            var firstName: String? = null
 
-        // iterating archive elements to find file names that are to be extracted
-        for (entry in sevenzFile.entries) {
-            if (filter.shouldExtract(entry.name, entry.isDirectory)) {
-                // Entry to be extracted is at least the entry path
-                // (may be more, when it is a directory)
-                arrayList.add(entry)
-                totalBytes += entry.size
+            // iterating archive elements to find file names that are to be extracted
+            for (entry in sevenzFile.entries) {
+                if (filter.shouldExtract(entry.name, entry.isDirectory)) {
+                    // Entry to be extracted is at least the entry path
+                    // (may be more, when it is a directory)
+                    if (firstName == null) firstName = entry.name
+                    wanted.add(entry)
+                    totalBytes += entry.size
+                }
             }
+            if (firstName == null) {
+                throw EmptyArchiveNotice()
+            }
+            listener.onStart(totalBytes, firstName)
+            var entry: SevenZArchiveEntry?
+            while (sevenzFile.nextEntry.also { entry = it } != null) {
+                if (!wanted.contains(entry)) {
+                    continue
+                }
+                if (!listener.isCancelled) {
+                    listener.onUpdate(entry!!.name)
+                    extractEntry(context, sevenzFile, entry!!, outputPath)
+                }
+            }
+            listener.onFinish()
+        } finally {
+            sevenzFile.close()
         }
-        listener.onStart(totalBytes, arrayList[0].name)
-        var entry: SevenZArchiveEntry?
-        while (sevenzFile.nextEntry.also { entry = it } != null) {
-            if (!arrayList.contains(entry)) {
-                continue
-            }
-            if (!listener.isCancelled) {
-                listener.onUpdate(entry!!.name)
-                extractEntry(context, sevenzFile, entry!!, outputPath)
-            }
-        }
-        sevenzFile.close()
-        listener.onFinish()
     }
 
     @Throws(IOException::class)
@@ -105,10 +117,10 @@ class SevenZipExtractor(
         entry: SevenZArchiveEntry,
         outputDir: String,
     ) {
-        val outputFile = File(outputDir, entry.name)
+        val outputFile = File(outputDir, fixEntryName(entry.name))
         checkEntryPath(outputFile, outputDir)
         if (entry.isDirectory) {
-            MakeDirectoryOperation.mkdir(File(outputDir, entry.name), context)
+            MakeDirectoryOperation.mkdir(outputFile, context)
             return
         }
         if (!outputFile.parentFile.exists()) {
@@ -131,6 +143,7 @@ class SevenZipExtractor(
                                 bytesLeft
                             },
                         )
+                    if (length < 0) throw IOException("Unexpected end of 7z data in ${entry.name}")
                     write(content, 0, length)
                     updatePosition.updatePosition(length.toLong())
                     progress += length.toLong()
